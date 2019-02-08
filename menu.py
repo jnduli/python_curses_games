@@ -1,4 +1,5 @@
 import curses
+from snake import snake
 
 def menu(stdscreen):
     stdscreen.clear()
@@ -30,4 +31,5 @@ def key_action(stdscreen):
     elif key in [curses.KEY_UP, ord('k')]:
         return -1
     else:
+        snake(stdscreen)
         return 0

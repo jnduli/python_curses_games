@@ -1,7 +1,7 @@
 import random
 import curses
 
-def main (s):
+def snake (s):
     #  s = curses.initscr()
     curses.curs_set(0)
     sh, sw = s.getmaxyx()
@@ -57,5 +57,3 @@ def main (s):
             w.addch(tail[0], tail[1], ' ')
 
         w.addch(snake[0][0], snake[0][1], curses.ACS_CKBOARD)
-
-curses.wrapper(main);
