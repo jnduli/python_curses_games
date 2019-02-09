@@ -19,7 +19,6 @@ def updateScore(scoreWindow, score):
     scoreWindow.addstr(height//2, width//2, scoreMessage)
     scoreWindow.refresh()
 
-
 def snake(stdscreen):
     curses.curs_set(0)
     height, width = stdscreen.getmaxyx()

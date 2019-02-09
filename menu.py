@@ -1,13 +1,22 @@
 import curses
 from snake import snake
+from nogame import nogame
 
 def menu(stdscreen):
     stdscreen.clear()
-    items = ['Snake', 'Tetris(Not implemented)', 'Typing Tutor(Not Implemented)']
+    stdscreen.keypad(True)
+    curses.cbreak()
+    items = {
+            'Snake' : snake,
+            'Tetris(Not Implemented': nogame,
+            'Typing Tutor(Not Implemented': nogame
+            }
     display(stdscreen, items)
 
 def display(stdscreen, items, menu_y=5):
     selected = 0
+    stdscreen.addstr(menu_y, 1, 'Press y to start game, j/up to move up, k/down to move down, q to quit')
+    menu_y = menu_y + 3
     while True:
         for index, item in enumerate(items):
             if index == selected:
@@ -15,15 +24,18 @@ def display(stdscreen, items, menu_y=5):
             else:
                 mode = curses.A_NORMAL
             stdscreen.addstr(menu_y + index, 1, '{}. {}'.format(index,item), mode)
-        selected = selected + key_action(stdscreen)
+        key = stdscreen.getch()
+        motion = key_motion(key)
+        selected = selected + motion
         if selected < 0:
             selected = 0
         if selected >= len(items):
             selected = len(items)-1
+
+        key_game_launcher(key, items, selected, stdscreen)
         stdscreen.refresh()
 
-def key_action(stdscreen):
-    key = stdscreen.getch()
+def key_motion(key):
     if key == ord('q'):
         quit()
     elif key in [curses.KEY_DOWN, ord('j')]:
@@ -31,5 +43,13 @@ def key_action(stdscreen):
     elif key in [curses.KEY_UP, ord('k')]:
         return -1
     else:
-        snake(stdscreen)
         return 0
+
+def key_game_launcher(key, items, index, stdscreen):
+    stdscreen.addch(1, 1, key)
+    if key is ord('y'):
+        stdscreen.addstr(0, 1, 'In enter method')
+        key = list(items)[index]
+        #  nogame(stdscreen)
+        items[key](stdscreen)
+
