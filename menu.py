@@ -1,5 +1,6 @@
 import curses
 from snake import snake
+from tetris import tetris
 from nogame import nogame
 
 def menu(stdscreen):
@@ -8,7 +9,7 @@ def menu(stdscreen):
     curses.cbreak()
     items = {
             'Snake' : snake,
-            'Tetris(Not Implemented': nogame,
+            'Tetris(Not Implemented': tetris,
             'Typing Tutor(Not Implemented': nogame
             }
     display(stdscreen, items)
