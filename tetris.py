@@ -17,6 +17,17 @@ def clear_car(window, y, x):
     for coord in get_car_array(y, x):
         window.addch(*coord, ' ')
 
+def generate_villain():
+    return [[0, 1], [7, 9]]
+
+def move_villains(window, villains):
+    for car in villains:
+        clear_car(window, *car)
+        car[0] = car[0] + 1
+        draw_car(window, *car)
+    return villains
+    
+
 def tetris(stdscreen):
     curses.curs_set(0)
     height, width = stdscreen.getmaxyx()
@@ -29,6 +40,7 @@ def tetris(stdscreen):
     hero = [height//2, width//3 + 1]
     left_limit = 1 
     right_limit = width - 4
+    villains = generate_villain()
     while key is not ord('q'):
         key = window.getch()
         draw_car(window, *hero)
@@ -40,6 +52,7 @@ def tetris(stdscreen):
         if hero[1] is not new_x:
             clear_car(window, *hero)
             hero[1] = new_x
+        move_villains(window, villains)
         #  car(window, height//2, width//2)
 
 def hero_motion(key):
