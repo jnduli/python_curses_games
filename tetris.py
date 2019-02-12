@@ -1,37 +1,45 @@
 import curses
 
 MOTION = 3
-def car(window, y, x):
-    window.addch(y, x+1, curses.ACS_CKBOARD) 
-    window.addch(y+1, x, curses.ACS_CKBOARD)
-    window.addch(y+1, x+1, curses.ACS_CKBOARD)
-    window.addch(y+1, x+2, curses.ACS_CKBOARD)
-    window.addch(y+2, x+1, curses.ACS_CKBOARD)
-    window.addch(y+3, x, curses.ACS_CKBOARD)
-    window.addch(y+3, x+1, curses.ACS_CKBOARD)
-    window.addch(y+3, x+2, curses.ACS_CKBOARD)
+def get_car_array (y, x):
+    return [
+            [y,x+1], 
+            [y+1, x], [y+1, x+1], [y+1, x+2],
+            [y+2, x+1],
+            [y+3, x], [y+3, x+1], [y+3, x+2],
+            ] 
+
+def draw_car(window, y, x):
+    for coord in get_car_array(y,x):
+        window.addch(*coord, curses.ACS_CKBOARD)
+
+def clear_car(window, y, x):
+    for coord in get_car_array(y, x):
+        window.addch(*coord, ' ')
 
 def tetris(stdscreen):
+    curses.curs_set(0)
     height, width = stdscreen.getmaxyx()
-    window = curses.newwin(height, 13, 0 , width//2 - 2)
+    window = curses.newwin(height, 13, 0 , width//2)
     height, width = window.getmaxyx()
     window.keypad(1)
-    #  window.timeout(100)
+    window.timeout(100)
     window.border(0,0,0,0,0,0,0,0)
     key = 0
-    hero = [height//2, width//3]
-    left_limit = 0
-    right_limit = 6
+    hero = [height//2, width//3 + 1]
+    left_limit = 1 
+    right_limit = width - 4
     while key is not ord('q'):
         key = window.getch()
-        car(window, *hero)
-        new_x = hero_motion(key) * 3 + hero[1]
+        draw_car(window, *hero)
+        new_x = hero_motion(key) * 4 + hero[1]
         if new_x < left_limit:
             new_x = left_limit
         if new_x > right_limit:
             new_x = right_limit
-        hero[1] = new_x
-        window.refresh()
+        if hero[1] is not new_x:
+            clear_car(window, *hero)
+            hero[1] = new_x
         #  car(window, height//2, width//2)
 
 def hero_motion(key):
