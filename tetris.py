@@ -26,6 +26,26 @@ def move_villains(window, villains):
         car[0] = car[0] + 1
         draw_car(window, *car)
     return villains
+
+def generate_car_bounds(car):
+    return [car, [car[0], car[1]+3],[car[0]+4, car[1]], [car[0]+4, car[1] + 3]]
+
+def check_in_rectangle(car, point):
+    car_x = car[1]
+    car_y = car[0]
+    y = point[0]
+    x = point[1]
+    if (x >= car_x and x <= (car_x + 3) and y >= car_y and y <= (car_y +4)):
+        return True
+    return False
+
+def check_for_collisions(hero, villains):
+    hero_points = generate_car_bounds(hero)
+    for v in villains:
+        for point in hero_points:
+            if check_in_rectangle(v, point):
+                return True
+    return False
     
 
 def tetris(stdscreen):
@@ -53,7 +73,8 @@ def tetris(stdscreen):
             clear_car(window, *hero)
             hero[1] = new_x
         move_villains(window, villains)
-        #  car(window, height//2, width//2)
+        if (check_for_collisions(hero, villains)):
+            return
 
 def hero_motion(key):
     if key in [curses.KEY_LEFT, ord('h')]:
