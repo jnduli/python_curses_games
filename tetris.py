@@ -1,4 +1,5 @@
 import curses
+import random
 
 MOTION = 3
 def get_car_array (y, x):
@@ -17,8 +18,15 @@ def clear_car(window, y, x):
     for coord in get_car_array(y, x):
         window.addch(*coord, ' ')
 
-def generate_villain():
-    return [[0, 1], [7, 9]]
+def generate_villain(hero):
+    allowed_x = [1, 5, 9]
+    generate = random.randint(1,9) % 4 == 0
+    if generate:
+        villain = [random.randint(0,20), allowed_x[random.randint(0,2)]]
+        if check_for_collisions(hero, [villain]):
+            return None
+        return villain
+    return None
 
 def move_villains(window, villains):
     for car in villains:
@@ -69,9 +77,12 @@ def tetris(stdscreen):
     hero = [height//2, width//3 + 1]
     left_limit = 1 
     right_limit = width - 4
-    villains = generate_villain()
+    villains = []
     while key is not ord('q'):
         key = window.getch()
+        villain = generate_villain(hero)
+        if villain:
+            villains.append(villain)
         draw_car(window, *hero)
         new_x = hero_motion(key) * 4 + hero[1]
         if new_x < left_limit:
@@ -88,8 +99,8 @@ def tetris(stdscreen):
 
 def hero_motion(key):
     if key in [curses.KEY_LEFT, ord('h')]:
-        return 1
-    elif key in [curses.KEY_RIGHT, ord('l')]:
         return -1
+    elif key in [curses.KEY_RIGHT, ord('l')]:
+        return 1
     else:
         return 0
