@@ -46,6 +46,15 @@ def check_for_collisions(hero, villains):
             if check_in_rectangle(v, point):
                 return True
     return False
+
+def remove_old_cars(window, villains, height):
+    new_villains = []
+    for car in villains:
+        if car[0] < (height-4):
+            new_villains.append(car)
+        else:
+            clear_car(window, *car)
+    return new_villains
     
 
 def tetris(stdscreen):
@@ -75,6 +84,7 @@ def tetris(stdscreen):
         move_villains(window, villains)
         if (check_for_collisions(hero, villains)):
             return
+        villains = remove_old_cars(window, villains, height)
 
 def hero_motion(key):
     if key in [curses.KEY_LEFT, ord('h')]:
