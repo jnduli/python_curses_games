@@ -1,5 +1,8 @@
 import curses
 import random
+from collections import namedtuple
+
+car = namedtuple('Car', ['y', 'x'])
 
 MOTION = 3
 def get_car_array (y, x):
