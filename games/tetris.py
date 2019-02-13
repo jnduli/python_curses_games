@@ -4,7 +4,6 @@ from collections import namedtuple
 
 car = namedtuple('Car', ['y', 'x'])
 
-MOTION = 3
 def get_car_array (car):
     '''
     Returns an array containing [y,x] values on 
@@ -20,15 +19,19 @@ def get_car_array (car):
             ] 
 
 def paint_car(window, car, character):
+    '''
+    Draws the car with the selected character provided
+    '''
     for coord in get_car_array(car):
         window.addch(*coord, character)
 
 def draw_car(window, car):
     paint_car(window, car, curses.ACS_CKBOARD)
 
-def clear_car(window, y, x):
+def clear_car(window, car):
     paint_car(window, car, ' ')
 
+#TODO: fix this up to prevent unwinable situations
 def generate_villain(hero):
     allowed_x = [1, 5, 9]
     generate = random.randint(1,9) % 4 == 0
@@ -39,21 +42,27 @@ def generate_villain(hero):
         return villain
     return None
 
+#TODO: control the speed of motion of villains
 def move_villains(window, villains):
     for car in villains:
-        clear_car(window, *car)
-        car[0] = car[0] + 1
-        draw_car(window, *car)
+        clear_car(window, car)
+        car.y = car.y + 1
+        draw_car(window, car)
     return villains
 
 def generate_car_bounds(car):
-    return [car, [car[0], car[1]+3],[car[0]+4, car[1]], [car[0]+4, car[1] + 3]]
+    """
+    Generate [y,x] coordinates that show coordinates of car rectangle
+    """
+    upper_left = [car.y, car.x]
+    upper_right = [car.y, car.x + 3]
+    lower_left = [car.y + 4, car.x]
+    lower_right = [car.y + 4, car.x + 3]
+    return [upper_left, upper_right, lower_left, lower_right]
 
 def check_in_rectangle(car, point):
-    car_x = car[1]
-    car_y = car[0]
-    y = point[0]
-    x = point[1]
+    [car_y, car_x] = car
+    [y, x] = point
     if (x >= car_x and x <= (car_x + 3) and y >= car_y and y <= (car_y +4)):
         return True
     return False
