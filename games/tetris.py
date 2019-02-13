@@ -35,11 +35,18 @@ def clear_car(window, car):
 def generate_villain(hero, villains):
     allowed_x = [1, 5, 9]
     # 20 % change of villain generation
-    generate = random.randint(1,5) % 5 == 0
+    generate = random.randint(1,2) % 1 == 0
     if not generate:
         return None
-    villain = car(y=random.randint(0,20), x=allowed_x[random.randint(0,2)])
+    villain = car(y=random.randint(0,5), x=allowed_x[random.randint(0,2)])
     if check_for_collisions(hero, [villain]):
+        return None
+    if not villains:
+        return villain
+    last_villain = villains[-1]
+    if check_for_collisions(villain, [last_villain]):
+        return None
+    if (villain.x == 5 or villain.x !=5) and (villain.y + 9) > last_villain.y:
         return None
     return villain
 
