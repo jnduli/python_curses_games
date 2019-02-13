@@ -1,7 +1,7 @@
 import curses
-from snake import snake
-from tetris import tetris
-from nogame import nogame
+from games.snake import snake
+from games.tetris import tetris
+from games.nogame import nogame
 
 def menu(stdscreen):
     stdscreen.clear()
