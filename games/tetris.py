@@ -5,7 +5,13 @@ from collections import namedtuple
 car = namedtuple('Car', ['y', 'x'])
 
 MOTION = 3
-def get_car_array (y, x):
+def get_car_array (car):
+    '''
+    Returns an array containing [y,x] values on 
+    which to draw the parts of the car
+    '''
+    y = car.y
+    x = car.x
     return [
             [y,x+1], 
             [y+1, x], [y+1, x+1], [y+1, x+2],
@@ -13,13 +19,15 @@ def get_car_array (y, x):
             [y+3, x], [y+3, x+1], [y+3, x+2],
             ] 
 
-def draw_car(window, y, x):
-    for coord in get_car_array(y,x):
-        window.addch(*coord, curses.ACS_CKBOARD)
+def paint_car(window, car, character):
+    for coord in get_car_array(car):
+        window.addch(*coord, character)
+
+def draw_car(window, car):
+    paint_car(window, car, curses.ACS_CKBOARD)
 
 def clear_car(window, y, x):
-    for coord in get_car_array(y, x):
-        window.addch(*coord, ' ')
+    paint_car(window, car, ' ')
 
 def generate_villain(hero):
     allowed_x = [1, 5, 9]
