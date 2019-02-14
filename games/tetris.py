@@ -63,6 +63,8 @@ def tetris (stdscreen):
         clear_letter(window, shape)
         some = point(y=some.y+1, x = some.x)
         #  shape = zed(some)['shape']
+        shape, boundingbox = key_motion(key, shape, boundingbox)
+        #  boundingbox = zed(some)['boundingbox']
         draw_letter(window, shape)
 
 def key_motion(key, shape, boundingbox):
