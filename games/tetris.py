@@ -64,12 +64,19 @@ def tetris (stdscreen):
         some = point(y=some.y+1, x = some.x)
         #  shape = zed(some)['shape']
         shape, boundingbox = key_motion(key, shape, boundingbox)
+        shape, boundingbox = move_down(shape, boundingbox)
         #  boundingbox = zed(some)['boundingbox']
         draw_letter(window, shape)
 
 def key_motion(key, shape, boundingbox):
     if key is ord('r'):
         shape,boundingbox = rotate_object(shape, boundingbox)
+
+def move_down(shape, boundingbox):
+    shape = [[coord[0]+1, coord[1]] for coord in shape]
+    boundingbox = [[coord[0]+1, coord[1]] for coord in boundingbox]
+    return [shape, boundingbox]
+
 def rotate_object(shape, boundingbox):
     '''
     This does a matrix manipulation on all the points by
