@@ -95,20 +95,39 @@ def remove_old_cars(window, villains):
             clear_car(window, car)
     return new_villains
     
-
-def racing(stdscreen):
-    curses.curs_set(0)
+def create_score_board(stdscreen):
     height, width = stdscreen.getmaxyx()
     window = curses.newwin(height, 13, 0 , width//2)
-    height, width = window.getmaxyx()
     window.keypad(1)
     window.timeout(100)
     window.border(0,0,0,0,0,0,0,0)
+    return window
+
+def create_game_board(stdscreen):
+    height, width = stdscreen.getmaxyx()
+    window = curses.newwin(height, width//2 - 20, 0 , width//2 + 14)
+    window.border(0,0,0,0,0,0,0,0)
+    window.addstr(height//4, 1, 'Press q to leave racing game')
+    window.refresh()
+    return window
+
+def updateScore(scoreWindow, score):
+    scoreMessage = 'Score: {}'.format(score)
+    height, width = scoreWindow.getmaxyx()
+    scoreWindow.addstr(height//2, width//2, scoreMessage)
+    scoreWindow.refresh()
+
+def racing(stdscreen):
+    curses.curs_set(0)
+    window = create_score_board(stdscreen)
+    height, width = window.getmaxyx()
+    score_window = create_game_board(stdscreen)
     key = 0
-    hero = car(y=height//2, x=width//3 + 1)
+    hero = car(y=(height*3)//5, x=width//3 + 1)
     left_limit = 1 
     right_limit = width - 4
     villains = []
+    score = 0
     while key is not ord('q'):
         key = window.getch()
         villain = generate_villain(hero, villains)
@@ -126,7 +145,11 @@ def racing(stdscreen):
         villains = move_villains(window, villains)
         if (check_for_collisions(hero, villains)):
             return
+        before_clear = len(villains)
         villains = remove_old_cars(window, villains)
+        after_clear = len(villains)
+        score = score + (before_clear - after_clear )
+        updateScore(score_window, score)
 
 def hero_motion(key):
     if key in [curses.KEY_LEFT, ord('h')]:
