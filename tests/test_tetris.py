@@ -17,5 +17,5 @@ class TestTetris(unittest.TestCase):
         p = point(y=5, x = 10)
         local_zed = zed(p)
         actual = rotate_object(local_zed['shape'], local_zed['boundingbox'])
-        expected = [5.5, 11]
+        expected = [[-0.5, -1], [-0.5, 1], [0.5, -1], [0.5, 1]]
         self.assertEqual(actual, expected)

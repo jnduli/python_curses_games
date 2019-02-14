@@ -77,7 +77,7 @@ def rotate_object(shape, boundingbox):
     bb_origin = [bb_y, bb_x]
     # Get relative coordintes of bounding box
     bb_relative = [[coord[0] - bb_origin[0], coord[1] - bb_origin[1]] for coord in boundingbox]
-    return bb_origin
+    return bb_relative
     new_shape = []
     for coord in shape:
         y, x = coord
