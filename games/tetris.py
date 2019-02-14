@@ -1,5 +1,6 @@
 from collections import namedtuple
 import curses
+import random
 
 point = namedtuple('Car', ['y', 'x'])
 
@@ -21,16 +22,21 @@ def l (point):
             [y+1, x],
             [y+2, x], [y+2, x+1] 
             ]
-    boundingbox = [[y,x], [y,x+1], [y+2], [x+1]]
+    boundingbox = [[y,x], [y,x+1], [y+2, x], [y+2, x+1]]
     return [shape, boundingbox]
 
 def box (point):
     y = point.y
     x = point.x
-    return [
+    shape = [
             [y,x],[y, x+1],
             [y+1, x], [y+1, x+1]
             ]
+    return [shape, shape]
+
+def get_random_shape(point):
+    shapes = [zed, l, box]
+    return shapes[random.randint(0,2)](point)
 
 def draw_letter(window, points):
     for coord in points:
@@ -59,7 +65,7 @@ def tetris (stdscreen):
     boundingbox = None
     while key is not ord('q'):
         if (shape is None):
-            shape, boundingbox = zed(some)
+            shape, boundingbox = get_random_shape(some)
         key = window.getch()
         clear_letter(window, shape)
         shape, boundingbox = key_motion(key, shape, boundingbox)
