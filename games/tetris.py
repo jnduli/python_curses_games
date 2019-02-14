@@ -11,19 +11,18 @@ def zed(point):
             [y+1, x+1], [y+1, x+2]
             ]
     boundingbox = [[y,x], [y, x+2], [y+1,x], [y+1, x+2]]
-    return {
-            'shape': shape,
-            'boundingbox': boundingbox
-            }
+    return [shape, boundingbox]
 
 def l (point):
     y = point.y
     x = point.x
-    return [
+    shape = [
             [y,x],
             [y+1, x],
             [y+2, x], [y+2, x+1] 
             ]
+    boundingbox = [[y,x], [y,x+1], [y+2], [x+1]]
+    return [shape, boundingbox]
 
 def box (point):
     y = point.y
@@ -53,21 +52,45 @@ def tetris (stdscreen):
     window.timeout(100)
     window.border(0,0,0,0,0,0,0,0)
 
-    screen_blocks = [[0 for i in range(1, SCREEN_WIDTH)] for i in range (1, height)]
+    screen_blocks = [[0 for i in range(0, SCREEN_WIDTH)] for i in range (0, height)]
     key = 0
-    some = point(y=10, x=width//3 + 1)
-    shape = zed(some)['shape']
-    boundingbox = zed(some)['boundingbox']
+    some = point(y=0, x=width//3 + 1)
+    shape = None
+    boundingbox = None
     while key is not ord('q'):
+        if (shape is None):
+            shape, boundingbox = zed(some)
         key = window.getch()
         clear_letter(window, shape)
-        some = point(y=some.y+1, x = some.x)
-        #  shape = zed(some)['shape']
         shape, boundingbox = key_motion(key, shape, boundingbox)
         shape, boundingbox = move_down(shape, boundingbox)
-        #  boundingbox = zed(some)['boundingbox']
+        if (int(boundingbox[2][0]) >= (height-1) or check_shape_touched_floor(screen_blocks, shape)):
+            for coord in shape:
+                coord = [int(a) for a in coord]
+                screen_blocks[coord[0]][coord[1]] = 1
+            shape = None
+            boundingbox = None
+            continue
         draw_letter(window, shape)
+        draw_blocks(window, screen_blocks)
 
+def check_shape_touched_floor(shape_blocks, shape):
+    for coord in shape:
+        coord = [int(a) for a in coord]
+        if (coord[0]+1 >= len(shape_blocks)):
+            continue
+        next_layer = shape_blocks[coord[0]+1][coord[1]]
+        if next_layer == 1:
+            return True
+    return False
+
+def draw_blocks(window, shape_blocks):
+    for y, row in enumerate(shape_blocks):
+        for x, point in enumerate(row):
+            if point == 1:
+                draw_letter(window, [[y,x]])
+
+# TODO: deal with limits here
 def key_motion(key, shape, boundingbox):
     if key is ord('r'):
         shape,boundingbox = rotate_object(shape, boundingbox)
