@@ -96,7 +96,7 @@ def remove_old_cars(window, villains):
     return new_villains
     
 
-def tetris(stdscreen):
+def racing(stdscreen):
     curses.curs_set(0)
     height, width = stdscreen.getmaxyx()
     window = curses.newwin(height, 13, 0 , width//2)

@@ -1,10 +1,10 @@
 import unittest
-from games.tetris import car
-from games.tetris import get_car_array
-from games.tetris import generate_car_bounds
-from games.tetris import check_in_rectangle
+from games.racing import car
+from games.racing import get_car_array
+from games.racing import generate_car_bounds
+from games.racing import check_in_rectangle
 
-class TestTetris(unittest.TestCase):
+class TestRacing(unittest.TestCase):
     def test_get_car_array(self):
         hero = car(y=0, x = 0)
         expected = [[0,1],
