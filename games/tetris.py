@@ -58,19 +58,20 @@ def tetris (stdscreen):
     window.timeout(100)
     window.border(0,0,0,0,0,0,0,0)
 
-    screen_blocks = [[0 for i in range(0, SCREEN_WIDTH)] for i in range (0, height)]
+    screen_blocks = [[0 for i in range(0, SCREEN_WIDTH)] for i in range (0, height-1)]
     key = 0
     some = point(y=0, x=width//3 + 1)
     shape = None
     boundingbox = None
     while key is not ord('q'):
         if (shape is None):
+            #  shape, boundingbox = l(some)
             shape, boundingbox = get_random_shape(some)
         key = window.getch()
         clear_letter(window, shape)
-        shape, boundingbox = key_motion(key, shape, boundingbox)
+        shape, boundingbox = key_motion(key, shape, boundingbox, SCREEN_WIDTH-2, 1)
         shape, boundingbox = move_down(shape, boundingbox)
-        if (int(boundingbox[2][0]) >= (height-1) or check_shape_touched_floor(screen_blocks, shape)):
+        if (int(boundingbox[2][0]) >= (height-2) or check_shape_touched_floor(screen_blocks, shape)):
             for coord in shape:
                 coord = [int(a) for a in coord]
                 screen_blocks[coord[0]][coord[1]] = 1
@@ -97,13 +98,13 @@ def draw_blocks(window, shape_blocks):
                 draw_letter(window, [[y,x]])
 
 # TODO: deal with limits here
-def key_motion(key, shape, boundingbox):
+def key_motion(key, shape, boundingbox, rightlimit, leftlimit=0):
     if key is ord('r'):
         shape,boundingbox = rotate_object(shape, boundingbox)
-    elif key in [curses.KEY_LEFT, ord('h')]:
+    elif key in [curses.KEY_LEFT, ord('h')] and (boundingbox[0][1]-1)>=leftlimit:
         shape = [[coord[0], coord[1]-1] for coord in shape]
         boundingbox = [[coord[0], coord[1]-1] for coord in boundingbox]
-    elif key in [curses.KEY_RIGHT, ord('l')]:
+    elif key in [curses.KEY_RIGHT, ord('l')] and (boundingbox[1][1]+1) <= rightlimit:
         shape = [[coord[0], coord[1]+1] for coord in shape]
         boundingbox = [[coord[0], coord[1]+1] for coord in boundingbox]
     return [shape, boundingbox]
