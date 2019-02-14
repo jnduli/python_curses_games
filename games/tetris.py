@@ -71,6 +71,13 @@ def tetris (stdscreen):
 def key_motion(key, shape, boundingbox):
     if key is ord('r'):
         shape,boundingbox = rotate_object(shape, boundingbox)
+    elif key in [curses.KEY_LEFT, ord('h')]:
+        shape = [[coord[0], coord[1]-1] for coord in shape]
+        boundingbox = [[coord[0], coord[1]-1] for coord in boundingbox]
+    elif key in [curses.KEY_RIGHT, ord('l')]:
+        shape = [[coord[0], coord[1]+1] for coord in shape]
+        boundingbox = [[coord[0], coord[1]+1] for coord in boundingbox]
+    return [shape, boundingbox]
 
 def move_down(shape, boundingbox):
     shape = [[coord[0]+1, coord[1]] for coord in shape]
