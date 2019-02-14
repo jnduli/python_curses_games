@@ -16,6 +16,8 @@ class TestTetris(unittest.TestCase):
     def test_rotate_object(self):
         p = point(y=5, x = 10)
         local_zed = zed(p)
-        actual = rotate_object(local_zed['shape'], local_zed['boundingbox'])
-        expected = [[-0.5, -1], [-0.5, 1], [0.5, -1], [0.5, 1]]
-        self.assertEqual(actual, expected)
+        actual_shape, actual_bb = rotate_object(local_zed['shape'], local_zed['boundingbox'])
+        expected_bb = [[6.5, 10.5], [4.5, 10.5], [6.5, 11.5], [4.5, 11.5]]
+        self.assertEqual(actual_bb, expected_bb)
+        expected_shape = [[6.5, 10.5], [5.5, 10.5], [5.5, 11.5], [4.5, 11.5]]
+        self.assertEqual(actual_shape, expected_shape)

@@ -35,10 +35,12 @@ def box (point):
 
 def draw_letter(window, points):
     for coord in points:
+        coord = [int(x) for x in coord]
         window.addch(*coord, curses.ACS_CKBOARD)
 
 def clear_letter(window, points):
     for coord in points:
+        coord = [int(x) for x in coord]
         window.addch(*coord, ' ')
 
 SCREEN_WIDTH = 25
@@ -61,10 +63,11 @@ def tetris (stdscreen):
         clear_letter(window, shape)
         some = point(y=some.y+1, x = some.x)
         #  shape = zed(some)['shape']
-        shape = rotate_object(shape)
-        boundingbox = zed(some)['boundingbox']
         draw_letter(window, shape)
 
+def key_motion(key, shape, boundingbox):
+    if key is ord('r'):
+        shape,boundingbox = rotate_object(shape, boundingbox)
 def rotate_object(shape, boundingbox):
     '''
     This does a matrix manipulation on all the points by
@@ -75,11 +78,15 @@ def rotate_object(shape, boundingbox):
     bb_y = (boundingbox[0][0] + boundingbox[2][0]) / 2
     bb_x = (boundingbox[0][1] + boundingbox[1][1]) / 2
     bb_origin = [bb_y, bb_x]
-    # Get relative coordintes of bounding box
+    # Get relative coordinates of bounding box
     bb_relative = [[coord[0] - bb_origin[0], coord[1] - bb_origin[1]] for coord in boundingbox]
-    return bb_relative
-    new_shape = []
-    for coord in shape:
-        y, x = coord
-        new_shape.append([-x, y])
-    return new_shape
+    new_bb_relative = [rotate_point(*coord) for coord in bb_relative] 
+    new_bb = [[coord[0] + bb_origin[0], coord[1] + bb_origin[1]] for coord in new_bb_relative]
+    # Get relative coordinates of shape
+    shape_relative = [[coord[0] - bb_origin[0], coord[1] - bb_origin[1]] for coord in shape]
+    new_shape_relative = [rotate_point(*coord) for coord in shape_relative] 
+    new_shape = [[coord[0] + bb_origin[0], coord[1] + bb_origin[1]] for coord in new_shape_relative]
+    return [new_shape, new_bb]
+
+def rotate_point(y, x):
+    return [-x, y]
