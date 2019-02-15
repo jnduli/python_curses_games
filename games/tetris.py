@@ -3,12 +3,12 @@ import curses
 import random
 import time
 from .tetris_shapes import zed, l, box
+from .tetris_shapes import shapes
 
 point = namedtuple('Car', ['y', 'x'])
 
 def get_random_shape(point):
-    shapes = [zed, l, box]
-    return shapes[random.randint(0,2)](point)
+    return shapes[random.randint(0, len(shapes)-1)](point)
 
 def draw_letter(window, points):
     for coord in points:
@@ -89,6 +89,8 @@ def key_motion(key, shape, boundingbox, rightlimit, leftlimit=0):
     elif key in [curses.KEY_RIGHT, ord('l')] and (boundingbox[1][1]+1) <= rightlimit:
         shape = [[coord[0], coord[1]+1] for coord in shape]
         boundingbox = [[coord[0], coord[1]+1] for coord in boundingbox]
+    elif key in [curses.KEY_DOWN, ord('j')]:
+        shape, boundingbox = move_down(shape, boundingbox)
     return [shape, boundingbox]
 
 def move_down(shape, boundingbox):
