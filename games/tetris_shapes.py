@@ -1,4 +1,3 @@
-
 def zed(point):
     y = point.y
     x = point.x
@@ -28,3 +27,15 @@ def box (point):
             [y+1, x], [y+1, x+1]
             ]
     return [shape, shape]
+
+def t (point):
+    y = point.y
+    x = point.x
+    shape = [
+            [y,x],
+            [y+1, x], [y+1, x+1],
+            [y+2, x] 
+            ]
+    boundingbox = [[y,x], [y,x+1], [y+2, x], [y+2, x+1]]
+    return [shape, boundingbox]
+shapes = [zed, l, box, t]
