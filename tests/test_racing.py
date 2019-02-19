@@ -22,10 +22,10 @@ class TestRacing(unittest.TestCase):
         self.assertEqual(expected, actual)
     
     def test_check_in_rectangle(self):
-        hero = car(y=0, x=0)
+        hero = Car(y=0, x=0)
         point = [2,1]
-        self.assertTrue(check_in_rectangle(hero, point))
+        self.assertTrue(hero.is_point_in_car(point))
         point = [2,0]
-        self.assertTrue(check_in_rectangle(hero, point))
+        self.assertTrue(hero.is_point_in_car(point))
         point = [2,5]
-        self.assertFalse(check_in_rectangle(hero, point))
+        self.assertFalse(hero.is_point_in_car(point))

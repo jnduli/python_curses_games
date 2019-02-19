@@ -33,6 +33,17 @@ class Car():
         lower_left = [y + 4, x]
         lower_right = [y + 4, x + 3]
         return [upper_left, upper_right, lower_left, lower_right]
+
+    def is_point_in_car(self, point):
+        '''
+        Checks if the point is within the car coordinates
+        '''
+        [ul, ur, ll, lr] = self.bounding_rectangle()
+        [y, x] = point
+
+        if (x >= ul[1] and x <= ur[1] and y >= ul[0] and y <= ll[0]):
+            return True
+        return False
     
     def draw(self, window):
         for coord in self.body():
