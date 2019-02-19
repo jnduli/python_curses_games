@@ -13,8 +13,6 @@ class Race(Collision):
         self.left_limit = 1 
         self.right_limit = width - 4
         self.villains = Villains() 
-        key = 0
-        self.score = 0
 
     def loop(self):
         key = 0
@@ -25,20 +23,11 @@ class Race(Collision):
             self.hero.draw(self.game_window)
             self.villains.move(self.game_window)
             self.villains.draw(self.game_window)
-            new_x = self.hero_motion(key) * 4 + self.hero.x
-            if new_x < self.left_limit:
-                new_x = self.left_limit
-            if new_x > self.right_limit:
-                new_x = self.right_limit
-            if self.hero.x is not new_x:
-                self.hero.move(self.game_window, y=self.hero.y, x = new_x)
+            self.hero_motion(key)
             if (self.check_for_collisions(self.hero, self.villains)):
                 return
-            before_clear = len(self.villains)
-            self.villains.remove(self.game_window)
-            after_clear = len(self.villains)
-            score = score + (before_clear - after_clear )
-            self.updateScore(self.score_window, score)
+            score = score + self.villains.remove(self.game_window)
+            self.update_score(score)
 
     def create_game_board(self, stdscreen):
         height, width = stdscreen.getmaxyx()
@@ -57,15 +46,21 @@ class Race(Collision):
         return window
 
     def hero_motion(self, key):
+        new_x = self.hero.x 
         if key in [curses.KEY_LEFT, ord('h')]:
-            return -1
+            new_x = -4 + new_x
         elif key in [curses.KEY_RIGHT, ord('l')]:
-            return 1
-        else:
-            return 0
+            new_x = 4 + new_x
 
-    def updateScore(self, scoreWindow, score):
-        scoreMessage = 'Score: {}'.format(score)
-        height, width = scoreWindow.getmaxyx()
-        scoreWindow.addstr(height//2, width//2, scoreMessage)
-        scoreWindow.refresh()
+        if new_x < self.left_limit:
+            new_x = self.left_limit
+        if new_x > self.right_limit:
+            new_x = self.right_limit
+        if self.hero.x is not new_x:
+            self.hero.move(self.game_window, y=self.hero.y, x = new_x)
+
+    def update_score(self, score):
+        score_message = 'Score: {}'.format(score)
+        height, width = self.score_window.getmaxyx()
+        self.score_window.addstr(height//2, width//2, score_message)
+        self.score_window.refresh()
