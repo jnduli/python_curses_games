@@ -59,33 +59,6 @@ class Car():
         self.x = x
 
 
-def get_car_array (car):
-    '''
-    Returns an array containing [y,x] values on 
-    which to draw the parts of the car
-    '''
-    y = car.y
-    x = car.x
-    return [
-            [y,x+1], 
-            [y+1, x], [y+1, x+1], [y+1, x+2],
-            [y+2, x+1],
-            [y+3, x], [y+3, x+1], [y+3, x+2],
-            ] 
-
-def paint_car(window, car, character):
-    '''
-    Draws the car with the selected character provided
-    '''
-    for coord in get_car_array(car):
-        window.addch(*coord, character)
-
-def draw_car(window, car):
-    paint_car(window, car, curses.ACS_CKBOARD)
-
-def clear_car(window, car):
-    paint_car(window, car, ' ')
-
 #TODO: fix this up to prevent unwinable situations
 def generate_villain(hero, villains):
     allowed_x = [1, 5, 9]
@@ -111,22 +84,6 @@ def move_villains(window, villains):
         v.move(window, v.y+1, v.x)
     return villains
 
-def generate_car_bounds(car):
-    """
-    Generate [y,x] coordinates that show coordinates of car rectangle
-    """
-    upper_left = [car.y, car.x]
-    upper_right = [car.y, car.x + 3]
-    lower_left = [car.y + 4, car.x]
-    lower_right = [car.y + 4, car.x + 3]
-    return [upper_left, upper_right, lower_left, lower_right]
-
-def check_in_rectangle(car, point):
-    [car_y, car_x] = car
-    [y, x] = point
-    if (x >= car_x and x <= (car_x + 3) and y >= car_y and y <= (car_y +4)):
-        return True
-    return False
 
 def check_for_collisions(hero, villains):
     hero_points = hero.bounding_box()
