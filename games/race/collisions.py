@@ -1,5 +1,6 @@
 class Collision():
     def check_for_collisions(self, hero, villains):
+        """Checks if the hero and villains have hit each other"""
         hero_points = hero.bounding_box()
         for v in villains:
             for point in hero_points:

@@ -3,6 +3,7 @@ from .car import Car
 from .villains import Villains
 from .collisions import Collision
 
+
 class Race(Collision):
     def __init__(self, stdscreen):
         curses.curs_set(0)
@@ -10,9 +11,9 @@ class Race(Collision):
         height, width = self.game_window.getmaxyx()
         self.score_window = self.create_score_board(stdscreen)
         self.hero = Car(y=(height*3)//5, x=width//3 + 1)
-        self.left_limit = 1 
+        self.left_limit = 1
         self.right_limit = width - 4
-        self.villains = Villains() 
+        self.villains = Villains()
 
     def loop(self):
         key = 0
@@ -31,22 +32,22 @@ class Race(Collision):
 
     def create_game_board(self, stdscreen):
         height, width = stdscreen.getmaxyx()
-        window = curses.newwin(height, 13, 0 , width//2)
+        window = curses.newwin(height, 13, 0, width//2)
         window.keypad(1)
         window.timeout(100)
-        window.border(0,0,0,0,0,0,0,0)
+        window.border(0, 0, 0, 0, 0, 0, 0, 0)
         return window
 
     def create_score_board(self, stdscreen):
         height, width = stdscreen.getmaxyx()
-        window = curses.newwin(height, width//2 - 20, 0 , width//2 + 14)
-        window.border(0,0,0,0,0,0,0,0)
+        window = curses.newwin(height, width//2 - 20, 0, width//2 + 14)
+        window.border(0, 0, 0, 0, 0, 0, 0, 0)
         window.addstr(height//4, 1, 'Press q to leave racing game')
         window.refresh()
         return window
 
     def hero_motion(self, key):
-        new_x = self.hero.x 
+        new_x = self.hero.x
         if key in [curses.KEY_LEFT, ord('h')]:
             new_x = -4 + new_x
         elif key in [curses.KEY_RIGHT, ord('l')]:
@@ -57,7 +58,7 @@ class Race(Collision):
         if new_x > self.right_limit:
             new_x = self.right_limit
         if self.hero.x is not new_x:
-            self.hero.move(self.game_window, y=self.hero.y, x = new_x)
+            self.hero.move(self.game_window, y=self.hero.y, x=new_x)
 
     def update_score(self, score):
         score_message = 'Score: {}'.format(score)
