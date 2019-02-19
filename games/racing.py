@@ -13,8 +13,8 @@ class Car():
         Returns an array containing [y,x] values on 
         which to draw the parts of the car
         '''
-        y = car.y
-        x = car.x
+        y = self.y
+        x = self.x
         return [
                 [y, x+1], 
                 [y+1, x], [y+1, x+1], [y+1, x+2],
@@ -162,25 +162,24 @@ def racing(stdscreen):
     score = 0
     while key is not ord('q'):
         key = window.getch()
-        villain = generate_villain(hero, villains)
-        if villain:
-            villains.append(villain)
-        draw_car(window, hero)
-        new_x = hero_motion(key) * 4 + hero[1]
+        #  villain = generate_villain(hero, villains)
+        #  if villain:
+            #  villains.append(villain)
+        hero.draw(window)
+        new_x = hero_motion(key) * 4 + hero.x
         if new_x < left_limit:
             new_x = left_limit
         if new_x > right_limit:
             new_x = right_limit
-        if hero[1] is not new_x:
-            clear_car(window, hero)
-            hero = car(hero.y, new_x)
-        villains = move_villains(window, villains)
-        if (check_for_collisions(hero, villains)):
-            return
-        before_clear = len(villains)
-        villains = remove_old_cars(window, villains)
-        after_clear = len(villains)
-        score = score + (before_clear - after_clear )
+        if hero.x is not new_x:
+            hero.move(window, y=hero.y, x = new_x)
+        #  villains = move_villains(window, villains)
+        #  if (check_for_collisions(hero, villains)):
+            #  return
+        #  before_clear = len(villains)
+        #  villains = remove_old_cars(window, villains)
+        #  after_clear = len(villains)
+        #  score = score + (before_clear - after_clear )
         updateScore(score_window, score)
 
 def hero_motion(key):
