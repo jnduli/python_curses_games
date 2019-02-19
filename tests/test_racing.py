@@ -1,5 +1,5 @@
 import unittest
-from games.racing import Car
+from games.race.car import Car
 
 class TestRacing(unittest.TestCase):
     def test_get_car_body(self):
