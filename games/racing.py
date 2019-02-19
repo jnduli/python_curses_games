@@ -3,6 +3,38 @@ import random
 from collections import namedtuple
 
 car = namedtuple('Car', ['y', 'x'])
+class Car():
+    def __init__(self, y, x):
+        self.y = y
+        self.x = x
+
+    def get_body(self):
+        '''
+        Returns an array containing [y,x] values on 
+        which to draw the parts of the car
+        '''
+        y = car.y
+        x = car.x
+        return [
+                [y, x+1], 
+                [y+1, x], [y+1, x+1], [y+1, x+2],
+                [y+2, x+1],
+                [y+3, x], [y+3, x+1], [y+3, x+2],
+                ] 
+    
+    def draw(self, window):
+        for coord in self.get_body():
+            window.addch(*coord, curses.ACS_CKBOARD)
+
+    def clear(self, window):
+        for coord in self.get_body():
+            window.addch(*coord, ' ')
+
+    def move(self, window, y, x):
+        self.clear(window)
+        self.y = y
+        self.x = x
+
 
 def get_car_array (car):
     '''
@@ -123,7 +155,7 @@ def racing(stdscreen):
     height, width = window.getmaxyx()
     score_window = create_game_board(stdscreen)
     key = 0
-    hero = car(y=(height*3)//5, x=width//3 + 1)
+    hero = Car(y=(height*3)//5, x=width//3 + 1)
     left_limit = 1 
     right_limit = width - 4
     villains = []
