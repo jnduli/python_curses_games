@@ -44,15 +44,17 @@ class Villains(Collision):
         '''
         checks the first car in the list to see if it should be removed
         If its beyond the height of the window it is removed
+        Returns 1 if successfully removed villain, otherwise 0
         '''
         height,_ = window.getmaxyx()
         try:
             first_villain = self.villains[0]
             if (first_villain.y >= height - 4 ):
                 self.villains.popleft().clear(window)
-            return
+                return 1
+            return 0
         except IndexError:
-            return
+            return 0
 
     def draw(self, window):
         for car in self.villains:
