@@ -8,7 +8,7 @@ class Car():
         self.y = y
         self.x = x
 
-    def get_body(self):
+    def body(self):
         '''
         Returns an array containing [y,x] values on 
         which to draw the parts of the car
@@ -21,13 +21,25 @@ class Car():
                 [y+2, x+1],
                 [y+3, x], [y+3, x+1], [y+3, x+2],
                 ] 
+
+    def bounding_rectangle(self):
+        """
+        Generate [y,x] coordinates that show coordinates of car rectangle
+        """
+        y = self.y
+        x = self.x
+        upper_left = [y, x]
+        upper_right = [y, x + 3]
+        lower_left = [y + 4, x]
+        lower_right = [y + 4, x + 3]
+        return [upper_left, upper_right, lower_left, lower_right]
     
     def draw(self, window):
-        for coord in self.get_body():
+        for coord in self.body():
             window.addch(*coord, curses.ACS_CKBOARD)
 
     def clear(self, window):
-        for coord in self.get_body():
+        for coord in self.body():
             window.addch(*coord, ' ')
 
     def move(self, window, y, x):
