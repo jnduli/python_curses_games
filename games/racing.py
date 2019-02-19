@@ -22,7 +22,7 @@ class Car():
                 [y+3, x], [y+3, x+1], [y+3, x+2],
                 ] 
 
-    def bounding_rectangle(self):
+    def bounding_box(self):
         """
         Generate [y,x] coordinates that show coordinates of car rectangle
         """
@@ -38,7 +38,7 @@ class Car():
         '''
         Checks if the point is within the car coordinates
         '''
-        [ul, ur, ll, lr] = self.bounding_rectangle()
+        [ul, ur, ll, lr] = self.bounding_box()
         [y, x] = point
 
         if (x >= ul[1] and x <= ur[1] and y >= ul[0] and y <= ll[0]):
@@ -93,7 +93,7 @@ def generate_villain(hero, villains):
     generate = random.randint(1,2) % 1 == 0
     if not generate:
         return None
-    villain = car(y=random.randint(0,5), x=allowed_x[random.randint(0,2)])
+    villain = Car(y=random.randint(0,5), x=allowed_x[random.randint(0,2)])
     if check_for_collisions(hero, [villain]):
         return None
     if not villains:
@@ -107,13 +107,9 @@ def generate_villain(hero, villains):
 
 #TODO: control the speed of motion of villains
 def move_villains(window, villains):
-    new_villains = []
     for v in villains:
-        clear_car(window, v)
-        new_v = car(v.y+1, v.x)
-        draw_car(window, new_v)
-        new_villains.append(new_v)
-    return new_villains
+        v.move(window, v.y+1, v.x)
+    return villains
 
 def generate_car_bounds(car):
     """
@@ -133,10 +129,10 @@ def check_in_rectangle(car, point):
     return False
 
 def check_for_collisions(hero, villains):
-    hero_points = generate_car_bounds(hero)
+    hero_points = hero.bounding_box()
     for v in villains:
         for point in hero_points:
-            if check_in_rectangle(v, point):
+            if v.is_point_in_car(point):
                 return True
     return False
 
@@ -146,8 +142,9 @@ def remove_old_cars(window, villains):
     for car in villains:
         if car.y < (height-4):
             new_villains.append(car)
+            car.draw(window)
         else:
-            clear_car(window, car)
+            car.clear(window)
     return new_villains
     
 def create_score_board(stdscreen):
@@ -185,9 +182,9 @@ def racing(stdscreen):
     score = 0
     while key is not ord('q'):
         key = window.getch()
-        #  villain = generate_villain(hero, villains)
-        #  if villain:
-            #  villains.append(villain)
+        villain = generate_villain(hero, villains)
+        if villain:
+            villains.append(villain)
         hero.draw(window)
         new_x = hero_motion(key) * 4 + hero.x
         if new_x < left_limit:
@@ -196,13 +193,13 @@ def racing(stdscreen):
             new_x = right_limit
         if hero.x is not new_x:
             hero.move(window, y=hero.y, x = new_x)
-        #  villains = move_villains(window, villains)
-        #  if (check_for_collisions(hero, villains)):
-            #  return
-        #  before_clear = len(villains)
-        #  villains = remove_old_cars(window, villains)
-        #  after_clear = len(villains)
-        #  score = score + (before_clear - after_clear )
+        villains = move_villains(window, villains)
+        if (check_for_collisions(hero, villains)):
+            return
+        before_clear = len(villains)
+        villains = remove_old_cars(window, villains)
+        after_clear = len(villains)
+        score = score + (before_clear - after_clear )
         updateScore(score_window, score)
 
 def hero_motion(key):
