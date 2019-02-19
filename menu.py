@@ -1,6 +1,6 @@
 import curses
 from games.snake import snake
-from games.racing import racing
+from games.race.__main__ import racing
 from games.tetris import tetris
 from games.nogame import nogame
 
