@@ -53,15 +53,21 @@ class TestCar(unittest.TestCase):
 
 class TestVillains(unittest.TestCase):
 
-    def test_remove_villains(self):
+    def setUp(self):
         villains = Villains([1, 5, 9])
-        window = Window(height=30, width=13)
         villains.villains.append(Car(28, 1))
         villains.villains.append(Car(15, 5))
         villains.villains.append(Car(0, 1))
-        self.assertEqual(villains.remove(window), 1)
-        self.assertEqual(villains.remove(window), 0)
-        self.assertEqual(len(villains), 2)
+        self.villains = villains
+        self.window = Window(height=30, width=13)
+
+    def test_remove_villains(self):
+        self.assertEqual(self.villains.remove(self.window), 1)
+        self.assertEqual(self.villains.remove(self.window), 0)
+        self.assertEqual(len(self.villains), 2)
 
     def test_move_villains(self):
-        raise NotImplementedError
+        self.villains.move(self.window)
+        expected_y = [29, 16, 1]
+        for v in zip(self.villains, expected_y):
+            self.assertEqual(v[0].y, v[1])
