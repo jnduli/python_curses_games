@@ -2,6 +2,9 @@ import curses
 
 
 class Car():
+    CAR_WIDTH = 3
+    CAR_HEIGHT = 4
+
     def __init__(self, y, x):
         self.y = y
         self.x = x
@@ -22,9 +25,9 @@ class Car():
         y = self.y
         x = self.x
         upper_left = [y, x]
-        upper_right = [y, x + 3]
-        lower_left = [y + 4, x]
-        lower_right = [y + 4, x + 3]
+        upper_right = [y, x+self.CAR_WIDTH]
+        lower_left = [y+self.CAR_HEIGHT, x]
+        lower_right = [y+self.CAR_HEIGHT, x+self.CAR_WIDTH]
         return [upper_left, upper_right, lower_left, lower_right]
 
     def is_point_in_car(self, point):
@@ -44,8 +47,9 @@ class Car():
         for coord in self.body():
             window.addch(*coord, ' ')
 
-    def move(self, window, y, x):
+    def move(self, y, x, window=None):
         """Clears car from screen then adjusts the car's coordinates"""
-        self.clear(window)
+        if window:
+            self.clear(window)
         self.y = y
         self.x = x

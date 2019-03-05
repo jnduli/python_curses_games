@@ -1,4 +1,5 @@
 import unittest
+import curses
 from games.race.car import Car
 
 class TestRacing(unittest.TestCase):
@@ -25,3 +26,10 @@ class TestRacing(unittest.TestCase):
         self.assertTrue(hero.is_point_in_car(point))
         point = [2,5]
         self.assertFalse(hero.is_point_in_car(point))
+
+    def test_move(self):
+        hero = Car(y=0, x=0)
+        hero.move(y=3, x=2)
+        self.assertEqual(hero.x, 2)
+        self.assertEqual(hero.y, 3)
+
