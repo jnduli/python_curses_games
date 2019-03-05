@@ -1,4 +1,5 @@
 import curses
+from random import randint
 from .car import Car
 from .villains import Villains
 from .collisions import Collision
@@ -9,13 +10,14 @@ class TerminalTooSmallError(Exception):
 
 
 class Race(Collision):
-    x_positions = [1, 5, 9]
     MIN_HEIGHT = 20
     MIN_WIDTH = 40
+    PADDING = 1
 
     def __init__(self, stdscreen):
         curses.curs_set(0)
         screen_height, screen_width = stdscreen.getmaxyx()
+
         if screen_height < Race.MIN_HEIGHT:
             raise TerminalTooSmallError('The screen height is too small')
         if screen_width < Race.MIN_WIDTH:
@@ -24,10 +26,23 @@ class Race(Collision):
         self.game_window = self.create_game_board(stdscreen)
         height, width = self.game_window.getmaxyx()
         self.score_window = self.create_score_board(stdscreen)
-        self.hero = Car(y=(height*3)//5, x=width//3 + 1)
-        self.left_limit = 1
-        self.right_limit = width - 4
-        self.villains = Villains(Race.x_positions)
+        self.hero = Car(y=int(height*0.6), x=self.x_positions[randint(0, 2)])
+        # TODO: Remove this variables
+        self.left_limit = self.x_positions[0]
+        self.right_limit = self.x_positions[-1]
+        self.villains = Villains(self.x_positions)
+
+    @property
+    def x_positions(self):
+        """ Returns a list containing possible positions of the cars """
+        first = self.PADDING 
+        second = first + Car.CAR_WIDTH + self.PADDING
+        third = second + Car.CAR_WIDTH + self.PADDING
+        return [first, second, third]
+
+    @property
+    def game_width(self):
+        return self.x_positions[-1] + Car.CAR_WIDTH + self.PADDING
 
     def loop(self):
         key = 0
@@ -46,7 +61,7 @@ class Race(Collision):
 
     def create_game_board(self, stdscreen):
         height, width = stdscreen.getmaxyx()
-        window = curses.newwin(height, 13, 0, width//2)
+        window = curses.newwin(height, self.game_width, 0, width//2)
         window.keypad(1)
         window.timeout(100)
         window.border(0, 0, 0, 0, 0, 0, 0, 0)
@@ -54,23 +69,28 @@ class Race(Collision):
 
     def create_score_board(self, stdscreen):
         height, width = stdscreen.getmaxyx()
-        window = curses.newwin(height, width//2 - 20, 0, width//2 + 14)
+        quit_message = 'Press q to quit'
+        score_width = len(quit_message) + self.PADDING * 2
+        window = curses.newwin(height, score_width, 0, width//2 + self.game_width)
         window.border(0, 0, 0, 0, 0, 0, 0, 0)
-        window.addstr(height//4, 1, 'Press q to leave racing game')
+        window.addstr(height//4, 1, quit_message)
         window.refresh()
         return window
 
     def hero_motion(self, key):
         new_x = self.hero.x
+        motion_distance = self.hero.CAR_WIDTH + self.PADDING
         if key in [curses.KEY_LEFT, ord('h')]:
-            new_x = -4 + new_x
+            new_x = -motion_distance + new_x
         elif key in [curses.KEY_RIGHT, ord('l')]:
-            new_x = 4 + new_x
+            new_x = motion_distance + new_x
 
-        if new_x < self.left_limit:
-            new_x = self.left_limit
-        if new_x > self.right_limit:
-            new_x = self.right_limit
+        left_limit = self.x_positions[0]
+        right_limit = self.x_positions[-1]
+        if new_x < left_limit:
+            new_x = left_limit
+        if new_x > right_limit:
+            new_x = right_limit
         if self.hero.x is not new_x:
             self.hero.move(self.game_window, y=self.hero.y, x=new_x)
 
