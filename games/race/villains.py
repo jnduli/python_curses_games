@@ -5,8 +5,9 @@ from .car import Car
 
 
 class Villains(Collision):
-    def __init__(self):
+    def __init__(self, x_positions):
         self.villains = deque()
+        self.allowed_x = x_positions
 
     def __getitem__(self, index):
         return self.villains[index]
@@ -15,22 +16,27 @@ class Villains(Collision):
         return len(self.villains)
 
     def random_add(self, hero):
-        """Randomly generates villains 50% of the time per call"""
-        allowed_x = [1, 5, 9]
-        # 20 % change of villain generation
-        generate = random.randint(1, 2) % 1 == 0
-        villain = Car(y=random.randint(0, 5),
-                      x=allowed_x[random.randint(0, 2)])
-        if not generate and self.check_for_collisions(hero, [villain]):
+        """Randomly generates villains 70% of the time per call"""
+        generate = random.randint(0, 10) < 7
+        villain = Car(y=0,
+                      x=self.allowed_x[random.randint(0, 2)])
+        if not generate:
             return
 
         try:
             last_villain = self.villains[-1]
+            # Makes sure the generated villain and last villain don't collide
             if self.check_for_collisions(villain, [last_villain]):
                 return
-            if ((villain.x == 5 or villain.x != 5) and
-                    (villain.y + 9) > last_villain.y):
+            # Preventing three heros on a row
+            # Generate villain if there is enough space for hero to manoeuvre 
+            if villain.y + 9 > last_villain.y:
                 return
+
+            # if current villain is in the middle position 
+            #  if ((villain.x == 5 or villain.x != 5) and
+                    #  (villain.y + 9) > last_villain.y):
+                #  return
             self.villains.append(villain)
         except IndexError:
             self.villains.append(villain)
