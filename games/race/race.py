@@ -4,29 +4,43 @@ from .villains import Villains
 from .collisions import Collision
 
 
+class TerminalTooSmallError(Exception):
+    pass
+
+
 class Race(Collision):
+    x_positions = [1, 5, 9]
+    MIN_HEIGHT = 20
+    MIN_WIDTH = 40
+
     def __init__(self, stdscreen):
         curses.curs_set(0)
+        screen_height, screen_width = stdscreen.getmaxyx()
+        if screen_height < Race.MIN_HEIGHT:
+            raise TerminalTooSmallError('The screen height is too small')
+        if screen_width < Race.MIN_WIDTH:
+            raise TerminalTooSmallError('The width is too small')
+
         self.game_window = self.create_game_board(stdscreen)
         height, width = self.game_window.getmaxyx()
         self.score_window = self.create_score_board(stdscreen)
         self.hero = Car(y=(height*3)//5, x=width//3 + 1)
         self.left_limit = 1
         self.right_limit = width - 4
-        self.villains = Villains()
+        self.villains = Villains(Race.x_positions)
 
     def loop(self):
         key = 0
         score = 0
         while key is not ord('q'):
             key = self.game_window.getch()
+            if (self.check_for_collisions(self.hero, self.villains)):
+                return
             self.villains.random_add(self.hero)
             self.hero.draw(self.game_window)
             self.villains.move(self.game_window)
             self.villains.draw(self.game_window)
             self.hero_motion(key)
-            if (self.check_for_collisions(self.hero, self.villains)):
-                return
             score = score + self.villains.remove(self.game_window)
             self.update_score(score)
 
