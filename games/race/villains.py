@@ -15,7 +15,7 @@ class Villains(Collision):
     def __len__(self):
         return len(self.villains)
 
-    def random_add(self, hero):
+    def random_add(self, hero, difficulty=1):
         """Randomly generates villains 70% of the time per call"""
         generate = random.randint(0, 10) < 7
         villain = Car(y=0,
@@ -28,15 +28,18 @@ class Villains(Collision):
             # Makes sure the generated villain and last villain don't collide
             if self.check_for_collisions(villain, [last_villain]):
                 return
+            second_last_villain = self.villains[-2]
             # Preventing three heros on a row
             # Generate villain if there is enough space for hero to manoeuvre 
-            if villain.y + 9 > last_villain.y:
+            # However this prevents two heros following each other
+            generate_double = random.randint(0, 10) < difficulty 
+            if (generate_double
+                    and last_villain.y+Car.CAR_HEIGHT >= second_last_villain.y
+                    and villain.y + 9 > last_villain.y):
+                return
+            if (not generate_double and villain.y +9 > last_villain.y):
                 return
 
-            # if current villain is in the middle position 
-            #  if ((villain.x == 5 or villain.x != 5) and
-                    #  (villain.y + 9) > last_villain.y):
-                #  return
             self.villains.append(villain)
         except IndexError:
             self.villains.append(villain)
