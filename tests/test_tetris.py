@@ -1,6 +1,6 @@
 import unittest
 from games.tetris.tetris import rotate_object
-from games.tetris.shapes import Zed
+from games.tetris.shapes import Zed, L, Box, Tee
 from games.tetris.shapes import Point
 
 
@@ -26,6 +26,43 @@ class TestShapes(unittest.TestCase):
         expected_shape = [Point(6.5, 10.5), Point(5.5, 10.5),
                           Point(5.5, 11.5), Point(4.5, 11.5)]
         self.assertEqual(z.shape, expected_shape)
+
+    def test_L(self):
+        l_shape = L(y=5, x=5)
+        expected_shape = [
+                Point(5, 5),
+                Point(6, 5),
+                Point(7, 5), Point(7, 6)
+                ]
+        self.assertEqual(l_shape.shape, expected_shape)
+        expected_bb = [
+                Point(5, 5), Point(5, 6),
+                Point(7, 5), Point(7, 6)
+                ]
+        self.assertEqual(l_shape.boundingbox, expected_bb)
+
+    def test_box(self):
+        box = Box(y=5, x=5)
+        expected_shape = [
+                Point(5, 5), Point(5, 6),
+                Point(6, 5), Point(6, 6)
+                ]
+        self.assertEqual(box.shape, expected_shape)
+        self.assertEqual(box.boundingbox, expected_shape)
+
+    def test_tee(self):
+        tee = Tee(y=5, x=5)
+        expected_shape = [
+                Point(5, 5),
+                Point(6, 5), Point(6, 6),
+                Point(7, 5)
+                ]
+        self.assertEqual(tee.shape, expected_shape)
+        expected_bb = [
+                Point(5, 5), Point(5, 6),
+                Point(7, 5), Point(7, 6)
+                ]
+        self.assertEqual(tee.boundingbox, expected_bb)
 
 
 #  class TestTetris(unittest.TestCase):
