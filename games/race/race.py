@@ -47,17 +47,20 @@ class Race(Collision):
     def loop(self):
         key = 0
         score = 0
+        level = 0
         while key is not ord('q'):
             key = self.game_window.getch()
             if (self.check_for_collisions(self.hero, self.villains)):
                 return
-            self.villains.random_add(self.hero)
+            self.villains.random_add(self.hero, difficulty=level)
             self.hero.draw(self.game_window)
             self.villains.move(self.game_window)
             self.villains.draw(self.game_window)
             self.hero_motion(key)
             score = score + self.villains.remove(self.game_window)
-            self.update_score(score)
+            level = score // 10
+            self.game_window.timeout(100 - level * 10)
+            self.update_score(score=score, level=level)
 
     def create_game_board(self, stdscreen):
         height, width = stdscreen.getmaxyx()
@@ -73,7 +76,7 @@ class Race(Collision):
         score_width = len(quit_message) + self.PADDING * 2
         window = curses.newwin(height, score_width, 0, width//2 + self.game_width)
         window.border(0, 0, 0, 0, 0, 0, 0, 0)
-        window.addstr(height//4, 1, quit_message)
+        window.addstr(height//2 - 5, 1, quit_message)
         window.refresh()
         return window
 
@@ -94,8 +97,10 @@ class Race(Collision):
         if self.hero.x is not new_x:
             self.hero.move(self.game_window, y=self.hero.y, x=new_x)
 
-    def update_score(self, score):
+    def update_score(self, score, level=0):
         score_message = 'Score: {}'.format(score)
+        level_message = 'Level: {}'.format(level)
         height, width = self.score_window.getmaxyx()
+        self.score_window.addstr(height//2 - 2, width//2, level_message)
         self.score_window.addstr(height//2, width//2, score_message)
         self.score_window.refresh()
