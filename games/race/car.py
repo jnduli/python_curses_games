@@ -47,7 +47,7 @@ class Car():
         for coord in self.body():
             window.addch(*coord, ' ')
 
-    def move(self, y, x, window=None):
+    def move(self, window, y, x):
         """Clears car from screen then adjusts the car's coordinates"""
         if window:
             self.clear(window)
