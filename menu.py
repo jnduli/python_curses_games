@@ -1,7 +1,7 @@
 import curses
 from games.snake import snake
 from games.race.__main__ import racing
-from games.tetris.tetris import tetris
+from games.tetris.__main__ import tetris
 from games.nogame import nogame
 
 def menu(stdscreen):

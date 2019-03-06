@@ -19,52 +19,57 @@ def clear_letter(window, points):
         window.addch(int(coord.y), int(coord.x), ' ')
 
 
-SCREEN_WIDTH = 25
-DOWNWARDS_SPEED = 0.01  # number of characters to move down per second
+class Tetris:
+    SCREEN_WIDTH = 25
+    DOWNWARDS_SPEED = 0.01  # number of characters to move down per second
+
+    def __init__(self, stdscreen):
+        curses.curs_set(0)
+        height, width = stdscreen.getmaxyx()
+        # TODO: Add error checking for width and height
+        self.create_game_board(height, width)
+        self.screen_blocks = [[0 for i in range(0, self.SCREEN_WIDTH)]
+                         for i in range(0, height-1)]
+
+    def create_game_board(self, height, width):
+        self.window = curses.newwin(height, self.SCREEN_WIDTH, 0, width//2)
+        self.window.keypad(1)
+        self.window.timeout(41)  # This is set to throttle cpu usage
+        self.window.border(0, 0, 0, 0, 0, 0, 0, 0)
+
+    def loop(self):
+        boundingbox = None
+        prev_time = time.time_ns()
+
+        height, width = self.window.getmaxyx()
+        key = 0
+        shape = None
+        while key is not ord('q'):
+            if (shape is None):
+                shape = get_random_shape(y=0, x=width//3 + 1)
+            shape.clear(self.window)
+            key_motion(key, shape, self.SCREEN_WIDTH-2, 1)
+            if (should_move(prev_time)):
+                shape.move_down()
+                prev_time = time.time_ns()
+
+            if (int(shape.boundingbox[2][0]) >= (height-2)
+                    or check_shape_touched_floor(self.screen_blocks, shape.shape)):
+                for coord in shape.shape:
+                    coord = [int(a) for a in coord]
+                    self.screen_blocks[coord[0]][coord[1]] = 1
+                shape = None
+                draw_blocks(self.window, self.screen_blocks)
+                continue
+            shape.draw(self.window)
+            key = self.window.getch()
 
 
-def should_move(prevtime, downwards_speed=DOWNWARDS_SPEED):
+def should_move(prevtime, downwards_speed=Tetris.DOWNWARDS_SPEED):
     nanos = 1000000 / downwards_speed
     if (time.time_ns() - prevtime) >= nanos:
         return True
     return False
-
-
-def tetris(stdscreen):
-    curses.curs_set(0)
-    height, width = stdscreen.getmaxyx()
-    window = curses.newwin(height, SCREEN_WIDTH, 0, width//2)
-    height, width = window.getmaxyx()
-    window.keypad(1)
-    window.timeout(41)  # This is set to throttle cpu usage
-    window.border(0, 0, 0, 0, 0, 0, 0, 0)
-
-    screen_blocks = [[0 for i in range(0, SCREEN_WIDTH)]
-                     for i in range(0, height-1)]
-    key = 0
-    shape = None
-    boundingbox = None
-    prev_time = time.time_ns()
-
-    while key is not ord('q'):
-        if (shape is None):
-            shape = get_random_shape(y=0, x=width//3 + 1)
-        key = window.getch()
-        shape.clear(window)
-        key_motion(key, shape, SCREEN_WIDTH-2, 1)
-        if (should_move(prev_time)):
-            shape.move_down()
-            prev_time = time.time_ns()
-
-        if (int(shape.boundingbox[2][0]) >= (height-2)
-                or check_shape_touched_floor(screen_blocks, shape.shape)):
-            for coord in shape.shape:
-                coord = [int(a) for a in coord]
-                screen_blocks[coord[0]][coord[1]] = 1
-            shape = None
-            draw_blocks(window, screen_blocks)
-            continue
-        shape.draw(window)
 
 def check_shape_touched_floor(shape_blocks, shape):
     for coord in shape:
