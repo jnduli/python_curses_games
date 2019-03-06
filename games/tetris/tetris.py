@@ -2,24 +2,26 @@ from collections import namedtuple
 import curses
 import random
 import time
-from .tetris_shapes import zed, l, box
-from .tetris_shapes import shapes
+from .shapes import shapes
 
-point = namedtuple('Car', ['y', 'x'])
 
-def get_random_shape(point):
-    return shapes[random.randint(0, len(shapes)-1)](point)
+def get_random_shape(y, x):
+    return shapes[random.randint(0, len(shapes)-1)](y=y, x=x)
+
 
 def draw_letter(window, points):
     for coord in points:
         window.addch(int(coord[0]), int(coord[1]), curses.ACS_CKBOARD)
 
+
 def clear_letter(window, points):
-    for coord in points:
-        window.addch(int(coord[0]), int(coord[1]), ' ')
+    for coord in points.shape:
+        window.addch(int(coord.y), int(coord.x), ' ')
+
 
 SCREEN_WIDTH = 25
-DOWNWARDS_SPEED = 0.01 # number of characters to move down per second
+DOWNWARDS_SPEED = 0.01  # number of characters to move down per second
+
 
 def should_move(prevtime, downwards_speed=DOWNWARDS_SPEED):
     nanos = 1000000 / downwards_speed
@@ -27,41 +29,42 @@ def should_move(prevtime, downwards_speed=DOWNWARDS_SPEED):
         return True
     return False
 
-def tetris (stdscreen):
+
+def tetris(stdscreen):
     curses.curs_set(0)
     height, width = stdscreen.getmaxyx()
-    window = curses.newwin(height, SCREEN_WIDTH, 0 , width//2)
+    window = curses.newwin(height, SCREEN_WIDTH, 0, width//2)
     height, width = window.getmaxyx()
     window.keypad(1)
-    window.timeout(41) # This is set to throttle cpu usage
-    window.border(0,0,0,0,0,0,0,0)
+    window.timeout(41)  # This is set to throttle cpu usage
+    window.border(0, 0, 0, 0, 0, 0, 0, 0)
 
-    screen_blocks = [[0 for i in range(0, SCREEN_WIDTH)] for i in range (0, height-1)]
+    screen_blocks = [[0 for i in range(0, SCREEN_WIDTH)]
+                     for i in range(0, height-1)]
     key = 0
-    some = point(y=0, x=width//3 + 1)
     shape = None
     boundingbox = None
     prev_time = time.time_ns()
 
     while key is not ord('q'):
         if (shape is None):
-            shape, boundingbox = get_random_shape(some)
+            shape = get_random_shape(y=0, x=width//3 + 1)
         key = window.getch()
-        clear_letter(window, shape)
-        shape, boundingbox = key_motion(key, shape, boundingbox, SCREEN_WIDTH-2, 1)
+        shape.clear(window)
+        key_motion(key, shape, SCREEN_WIDTH-2, 1)
         if (should_move(prev_time)):
-            shape, boundingbox = move_down(shape, boundingbox)
+            shape.move_down()
             prev_time = time.time_ns()
 
-        if (int(boundingbox[2][0]) >= (height-2) or check_shape_touched_floor(screen_blocks, shape)):
-            for coord in shape:
+        if (int(shape.boundingbox[2][0]) >= (height-2)
+                or check_shape_touched_floor(screen_blocks, shape.shape)):
+            for coord in shape.shape:
                 coord = [int(a) for a in coord]
                 screen_blocks[coord[0]][coord[1]] = 1
             shape = None
-            boundingbox = None
             draw_blocks(window, screen_blocks)
             continue
-        draw_letter(window, shape)
+        shape.draw(window)
 
 def check_shape_touched_floor(shape_blocks, shape):
     for coord in shape:
@@ -80,18 +83,15 @@ def draw_blocks(window, shape_blocks):
                 draw_letter(window, [[y,x]])
 
 # TODO: deal with limits here
-def key_motion(key, shape, boundingbox, rightlimit, leftlimit=0):
+def key_motion(key, shape, rightlimit, leftlimit=0):
     if key is ord('r'):
-        shape,boundingbox = rotate_object(shape, boundingbox)
-    elif key in [curses.KEY_LEFT, ord('h')] and (boundingbox[0][1]-1)>=leftlimit:
-        shape = [[coord[0], coord[1]-1] for coord in shape]
-        boundingbox = [[coord[0], coord[1]-1] for coord in boundingbox]
-    elif key in [curses.KEY_RIGHT, ord('l')] and (boundingbox[1][1]+1) <= rightlimit:
-        shape = [[coord[0], coord[1]+1] for coord in shape]
-        boundingbox = [[coord[0], coord[1]+1] for coord in boundingbox]
+        shape.rotate_clockwise()
+    elif key in [curses.KEY_LEFT, ord('h')]:
+        shape.move_left(leftlimit)
+    elif key in [curses.KEY_RIGHT, ord('l')]:
+        shape.move_right(rightlimit)
     elif key in [curses.KEY_DOWN, ord('j')]:
-        shape, boundingbox = move_down(shape, boundingbox)
-    return [shape, boundingbox]
+        shape.move_down()
 
 def move_down(shape, boundingbox):
     shape = [[coord[0]+1, coord[1]] for coord in shape]
