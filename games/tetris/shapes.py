@@ -1,4 +1,5 @@
 from collections import namedtuple
+import curses
 
 Point = namedtuple('Point', ['y', 'x'])
 
@@ -17,9 +18,34 @@ class Shape:
         self.shape = shape
         self.boundingbox = boundingbox
 
+    def __getitem__(self, index):
+        return self.shape[index]
+
+    def draw(self, window):
+        for point in self.shape:
+            window.addch(int(point.y), int(point.x), curses.ACS_CKBOARD)
+
+    def clear(self, window):
+        for point in self.shape:
+            window.addch(int(point.y), int(point.x), ' ')
+
     def move_down(self):
         self.shape = [Point(y=coord.y+1, x=coord.x) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y+1, x=coord.x)
+                            for coord in self.boundingbox]
+
+    def move_left(self, leftlimit):
+        if self.boundingbox[0].x <= leftlimit:
+            return
+        self.shape = [Point(y=coord.y, x=coord.x-1) for coord in self.shape]
+        self.boundingbox = [Point(y=coord.y, x=coord.x-1)
+                            for coord in self.boundingbox]
+
+    def move_right(self, rightlimit):
+        if self.boundingbox[0].x >= rightlimit:
+            return
+        self.shape = [Point(y=coord.y, x=coord.x+1) for coord in self.shape]
+        self.boundingbox = [Point(y=coord.y, x=coord.x+1)
                             for coord in self.boundingbox]
 
     def rotate_clockwise(self):
