@@ -1,7 +1,7 @@
 import unittest
-from games.tetris.tetris import rotate_object
 from games.tetris.shapes import Zed, L, Box, Tee
 from games.tetris.shapes import Point
+from .test_racing import Window
 
 
 class TestShapes(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestShapes(unittest.TestCase):
 
     def test_rotate_zed(self):
         z = Zed(y=5, x=10)
-        z.rotate_clockwise()
+        z.rotate_clockwise(Window(), 20, 0)
         expected_bb = [Point(6.5, 10.5), Point(4.5, 10.5),
                        Point(6.5, 11.5), Point(4.5, 11.5)]
         self.assertEqual(z.boundingbox, expected_bb)

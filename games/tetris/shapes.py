@@ -29,26 +29,30 @@ class Shape:
         for point in self.shape:
             window.addch(int(point.y), int(point.x), ' ')
 
-    def move_down(self):
+    def move_down(self, window):
+        self.clear(window)
         self.shape = [Point(y=coord.y+1, x=coord.x) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y+1, x=coord.x)
                             for coord in self.boundingbox]
 
-    def move_left(self, leftlimit):
+    def move_left(self, leftlimit, window):
+        self.clear(window)
         if self.boundingbox[0].x <= leftlimit:
             return
         self.shape = [Point(y=coord.y, x=coord.x-1) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y, x=coord.x-1)
                             for coord in self.boundingbox]
 
-    def move_right(self, rightlimit):
+    def move_right(self, rightlimit, window):
+        self.clear(window)
         if self.boundingbox[0].x >= rightlimit:
             return
         self.shape = [Point(y=coord.y, x=coord.x+1) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y, x=coord.x+1)
                             for coord in self.boundingbox]
 
-    def rotate_clockwise(self):
+    def rotate_clockwise(self, window, rightlimit, leftlimit):
+        self.clear(window)
         [bb_y, bb_x] = self.get_shape_center()
         origin = Point(y=bb_y, x=bb_x)
         shape_relative = [Point(y=coord.y-bb_y, x=coord.x-bb_x)
@@ -59,6 +63,18 @@ class Shape:
                       for coord in shape_relative]
         self.boundingbox = [rotate_point_clockwise(coord, origin)
                             for coord in boundingbox_relative]
+        # Logic to save limits
+        if self.boundingbox[0].x <= leftlimit:
+            diff = leftlimit - self.boundingbox[0].x
+            self.modify_coordinates(diff)
+        if self.boundingbox[1].x >= rightlimit:
+            diff = rightlimit - self.boundingbox[1].x
+            self.modify_coordinates(diff)
+
+    def modify_coordinates(self, diff):
+        self.shape = [Point(y=coord.y, x=coord.x+diff) for coord in self.shape]
+        self.boundingbox = [Point(y=coord.y, x=coord.x+diff)
+                            for coord in self.boundingbox]
 
     def get_shape_center(self):
         bb_y = (self.boundingbox[0].y + self.boundingbox[2].y) / 2
