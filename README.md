@@ -11,6 +11,5 @@ To start the games:
 
 Some games have been implemented as runnable modules, so you can try:
 
-`python -m games.race`   
-
-to start the racing game.
+- `python -m games.race`: to start the racing game.
+- `python -m games.tetris`: to start the tetris game.
