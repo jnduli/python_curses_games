@@ -37,7 +37,7 @@ class Shape:
 
     def move_left(self, leftlimit, window):
         self.clear(window)
-        if self.boundingbox[0].x <= leftlimit:
+        if int(self.boundingbox[0].x) <= leftlimit:
             return
         self.shape = [Point(y=coord.y, x=coord.x-1) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y, x=coord.x-1)
@@ -63,11 +63,14 @@ class Shape:
                       for coord in shape_relative]
         self.boundingbox = [rotate_point_clockwise(coord, origin)
                             for coord in boundingbox_relative]
+        # Change postions in bounding box to reflect rotation
+        lower_left, upper_left, lower_right, upper_right = self.boundingbox
+        self.boundingbox = [upper_left, upper_right, lower_left, lower_right]
         # Logic to save limits
-        if self.boundingbox[0].x <= leftlimit:
+        if int(self.boundingbox[0].x) <= leftlimit:
             diff = leftlimit - self.boundingbox[0].x
             self.modify_coordinates(diff)
-        if self.boundingbox[1].x >= rightlimit:
+        if int(self.boundingbox[1].x) >= rightlimit:
             diff = rightlimit - self.boundingbox[1].x
             self.modify_coordinates(diff)
 
@@ -137,3 +140,4 @@ class Tee(Shape):
 
 
 shapes = [Zed, L, Box, Tee]
+shapes = [L, Tee]

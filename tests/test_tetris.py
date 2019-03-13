@@ -20,8 +20,8 @@ class TestShapes(unittest.TestCase):
     def test_rotate_zed(self):
         z = Zed(y=5, x=10)
         z.rotate_clockwise(Window(), 20, 0)
-        expected_bb = [Point(6.5, 10.5), Point(4.5, 10.5),
-                       Point(6.5, 11.5), Point(4.5, 11.5)]
+        expected_bb = [Point(4.5, 10.5), Point(4.5, 11.5),
+                       Point(6.5, 10.5), Point(6.5, 11.5)]
         self.assertEqual(z.boundingbox, expected_bb)
         expected_shape = [Point(6.5, 10.5), Point(5.5, 10.5),
                           Point(5.5, 11.5), Point(4.5, 11.5)]
