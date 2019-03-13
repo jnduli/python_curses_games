@@ -75,3 +75,6 @@ def snake(stdscreen):
         window.addch(snake[0][0], snake[0][1], curses.ACS_CKBOARD)
     return
 
+if __name__ == '__main__':
+    curses.wrapper(snake)
+
