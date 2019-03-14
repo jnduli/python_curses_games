@@ -10,8 +10,10 @@ def get_random_shape(y, x):
 
 class ScreenBlocks:
 
-    def __init__(self, width, height):
-        self.shape = [[0 for i in range(0, width)] for i in range(0, height)]
+    def __init__(self, width, height, tetris):
+        self.shape = [[0 for i in range(0, width+1)] for i in range(0, height)]
+        self.leftlimit = tetris.PADDING
+        self.rightlimit = width - tetris.PADDING
 
     def is_occupied(self, y, x):
         return self.shape[y][x] == 1
@@ -34,25 +36,18 @@ class ScreenBlocks:
                 if point == 1:
                     window.addch(y, x, curses.ACS_CKBOARD)
 
-    @property
-    def rightlimit(self):
-        return len(self.shape[0]) - 4
-
-    @property
-    def leftlimit(self):
-        return 1
-
 
 class Tetris:
     SCREEN_WIDTH = 25
     DOWNWARDS_SPEED = 0.01  # number of characters to move down per second
+    PADDING = 1
 
     def __init__(self, stdscreen):
         curses.curs_set(0)
         height, width = stdscreen.getmaxyx()
         # TODO: Add error checking for width and height
         self.create_game_board(height, width)
-        self.screen_blocks = ScreenBlocks(self.SCREEN_WIDTH, height-1)
+        self.screen_blocks = ScreenBlocks(self.SCREEN_WIDTH-self.PADDING, height-self.PADDING, self)
 
     def create_game_board(self, height, width):
         self.window = curses.newwin(height, self.SCREEN_WIDTH, 0, width//2)
