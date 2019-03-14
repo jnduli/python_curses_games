@@ -45,7 +45,7 @@ class Shape:
 
     def move_right(self, rightlimit, window):
         self.clear(window)
-        if self.boundingbox[0].x >= rightlimit:
+        if int(self.boundingbox[1].x) >= rightlimit:
             return
         self.shape = [Point(y=coord.y, x=coord.x+1) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y, x=coord.x+1)
