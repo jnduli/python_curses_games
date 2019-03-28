@@ -1,5 +1,8 @@
 from curses import wrapper
 from .tetris import Tetris
+import logging
+
+logging.basicConfig(filename='tetris.log',level=logging.INFO)
 
 def tetris(stdscreen):
     tetris = Tetris(stdscreen)

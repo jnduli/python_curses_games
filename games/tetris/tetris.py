@@ -2,6 +2,7 @@ import curses
 import random
 import time
 from .shapes import shapes
+import logging
 
 
 def get_random_shape(y, x):
@@ -12,6 +13,7 @@ class ScreenBlocks:
 
     def __init__(self, width, height, tetris):
         self.shape = [[0 for i in range(0, width+1)] for i in range(0, height)]
+        self.padding = tetris.PADDING
         self.leftlimit = tetris.PADDING
         self.rightlimit = width - tetris.PADDING
 
@@ -35,10 +37,28 @@ class ScreenBlocks:
             for x, point in enumerate(row):
                 if point == 1:
                     window.addch(y, x, curses.ACS_CKBOARD)
+                elif x > self.padding and x < len(self.shape[0])-self.padding-2:
+                    window.addch(y, x, ' ')
+
+    def clear_and_score(self):
+        score = 0
+        logging.info('Last 2')
+        logging.info(self.shape[-2])
+        logging.info(self.shape[-1])
+        for row in self.shape:
+            if 0 not in row[self.padding:-self.padding]:
+                logging.info('Removing row')
+                logging.info(self.shape)
+                # Remove the whole row
+                self.shape.remove(row)
+                # Append black row to top
+                self.shape.insert(0, [0 for i in range(0, len(row))])
+                score = score + 1
+        return score
 
 
 class Tetris:
-    SCREEN_WIDTH = 25
+    SCREEN_WIDTH = 15
     DOWNWARDS_SPEED = 0.01  # number of characters to move down per second
     PADDING = 1
 
@@ -72,6 +92,7 @@ class Tetris:
             if self.screen_blocks.check_shape_touched_floor(shape.shape):
                 self.screen_blocks.occupy(shape.shape)
                 shape = None
+                self.screen_blocks.clear_and_score()
                 self.screen_blocks.draw(self.window)
                 continue
             shape.draw(self.window)
