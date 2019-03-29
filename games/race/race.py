@@ -3,10 +3,7 @@ from random import randint
 from .car import Car
 from .villains import Villains
 from .collisions import Collision
-
-
-class TerminalTooSmallError(Exception):
-    pass
+from games.errors import TerminalTooSmallError
 
 
 class Race(Collision):

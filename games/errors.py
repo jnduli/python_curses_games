@@ -1,0 +1,2 @@
+class TerminalTooSmallError(Exception):
+    pass
