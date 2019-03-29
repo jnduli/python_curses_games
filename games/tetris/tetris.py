@@ -42,10 +42,10 @@ class ScreenBlocks:
                 elif x > self.padding and x < len(self.shape[0])-self.padding-2:
                     window.addch(y, x, ' ')
 
-    def clear_and_score(self):
-        logging.info('Last 2')
-        logging.info(self.shape[-2])
-        logging.info(self.shape[-1])
+    def clear_and_score(self, window):
+        # window is added as a parameter because for some reason there is
+        # persistence of some blocks after it is removed, so after clear the
+        # whole bottom row is replaced with ' '
         for row in self.shape:
             if 0 not in row[self.padding:-self.padding]:
                 logging.info('Removing row')
@@ -55,6 +55,8 @@ class ScreenBlocks:
                 # Append black row to top
                 self.shape.insert(0, [0 for i in range(0, len(row))])
                 self.score = self.score + 1
+                [window.addch(len(self.shape)-1, x, ' ')
+                    for x in range(1, len(row)-1)]
         return self.score
 
 
@@ -105,7 +107,7 @@ class Tetris:
             if self.screen_blocks.check_shape_touched_floor(shape.shape):
                 self.screen_blocks.occupy(shape.shape)
                 shape = None
-            self.screen_blocks.clear_and_score()
+            self.screen_blocks.clear_and_score(self.window)
             self.screen_blocks.draw(self.window)
             if shape:
                 shape.draw(self.window)
