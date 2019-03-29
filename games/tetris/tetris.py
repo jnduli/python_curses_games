@@ -11,11 +11,12 @@ def get_random_shape(y, x):
 
 class ScreenBlocks:
 
-    def __init__(self, width, height, tetris):
+    def __init__(self, width, height, padding):
         self.shape = [[0 for i in range(0, width+1)] for i in range(0, height)]
-        self.padding = tetris.PADDING
-        self.leftlimit = tetris.PADDING
-        self.rightlimit = width - tetris.PADDING
+        self.padding = padding
+        self.leftlimit = padding
+        self.rightlimit = width - padding
+        self.score = 0
 
     def is_occupied(self, y, x):
         return self.shape[y][x] == 1
@@ -41,7 +42,6 @@ class ScreenBlocks:
                     window.addch(y, x, ' ')
 
     def clear_and_score(self):
-        score = 0
         logging.info('Last 2')
         logging.info(self.shape[-2])
         logging.info(self.shape[-1])
@@ -92,10 +92,10 @@ class Tetris:
             if self.screen_blocks.check_shape_touched_floor(shape.shape):
                 self.screen_blocks.occupy(shape.shape)
                 shape = None
-                self.screen_blocks.clear_and_score()
-                self.screen_blocks.draw(self.window)
-                continue
-            shape.draw(self.window)
+            self.screen_blocks.clear_and_score()
+            self.screen_blocks.draw(self.window)
+            if shape:
+                shape.draw(self.window)
             key = self.window.getch()
 
     def key_motion(self, key, shape, rightlimit, leftlimit=0):
