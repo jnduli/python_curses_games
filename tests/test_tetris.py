@@ -1,6 +1,7 @@
 import unittest
 from games.tetris.shapes import Zed, L, Box, Tee
 from games.tetris.shapes import Point
+from games.tetris.tetris import ScreenBlocks
 from .test_racing import Window
 
 
@@ -63,3 +64,25 @@ class TestShapes(unittest.TestCase):
                 Point(7, 5), Point(7, 6)
                 ]
         self.assertEqual(tee.boundingbox, expected_bb)
+
+
+class TestScreenBlocks(unittest.TestCase):
+
+    def test_create_screen_blocks(self):
+        expected = [[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0]]
+        sb = ScreenBlocks(3, 3, 1)
+        self.assertEqual(sb.shape, expected)
+
+    def test_clear_and_score(self):
+        sb = ScreenBlocks(3, 3, 1)
+        new_shape = [[0, 0, 0, 0],[0, 0, 1, 0], [0, 1, 1, 0]]
+        sb.shape = new_shape
+        score = sb.clear_and_score()
+        self.assertEqual(score, 1)
+        expected_shape = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 1, 0]]
+        self.assertEqual(sb.shape, expected_shape)
+        sb.shape[2][1] = 1
+        score = sb.clear_and_score()
+        self.assertEqual(score, 2)
+        expected_shape = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        self.assertEqual(sb.shape, expected_shape)
