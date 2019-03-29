@@ -2,6 +2,7 @@ import curses
 import random
 import time
 from .shapes import shapes
+from games.errors import TerminalTooSmallError
 import logging
 
 
@@ -53,21 +54,28 @@ class ScreenBlocks:
                 self.shape.remove(row)
                 # Append black row to top
                 self.shape.insert(0, [0 for i in range(0, len(row))])
-                score = score + 1
-        return score
+                self.score = self.score + 1
+        return self.score
 
 
 class Tetris:
     SCREEN_WIDTH = 15
     DOWNWARDS_SPEED = 0.01  # number of characters to move down per second
     PADDING = 1
+    INFO_WIDTH = 20
+    MIN_HEIGHT = 30
 
     def __init__(self, stdscreen):
         curses.curs_set(0)
         height, width = stdscreen.getmaxyx()
-        # TODO: Add error checking for width and height
+
+        if height < self.MIN_HEIGHT:
+            raise TerminalTooSmallError("The terminal height is too small")
+        if width < self.SCREEN_WIDTH + self.INFO_WIDTH:
+            raise TerminalTooSmallError("The terminal widht is too small")
+
         self.create_game_board(height, width)
-        self.screen_blocks = ScreenBlocks(self.SCREEN_WIDTH-self.PADDING, height-self.PADDING, self)
+        self.screen_blocks = ScreenBlocks(self.SCREEN_WIDTH-self.PADDING, height-self.PADDING, self.PADDING)
 
     def create_game_board(self, height, width):
         self.window = curses.newwin(height, self.SCREEN_WIDTH, 0, width//2)
