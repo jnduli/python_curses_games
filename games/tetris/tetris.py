@@ -78,6 +78,7 @@ class Tetris:
             raise TerminalTooSmallError("The terminal widht is too small")
 
         self.create_game_board(height, width)
+        self.create_info_board()
         self.screen_blocks = ScreenBlocks(self.SCREEN_WIDTH-self.PADDING, height-self.PADDING, self.PADDING)
 
     def create_game_board(self, height, width):
@@ -85,6 +86,15 @@ class Tetris:
         self.window.keypad(1)
         self.window.timeout(41)  # This is set to throttle cpu usage
         self.window.border(0, 0, 0, 0, 0, 0, 0, 0)
+
+    def create_info_board(self):
+        # Should be called after create_game_board
+        (_, x) = self.window.getbegyx()
+        (height, win_width) = self.window.getmaxyx()
+        game_right_x = x + win_width
+        self.info_window = curses.newwin(
+                height, self.INFO_WIDTH, 0, game_right_x + self.PADDING)
+        self.info_window.border(0, 0, 0, 0, 0, 0, 0, 0)
 
     def loop(self):
         prev_time = time.time_ns()
@@ -111,6 +121,7 @@ class Tetris:
             self.screen_blocks.draw(self.window)
             if shape:
                 shape.draw(self.window)
+            self.update_info()
             key = self.window.getch()
 
     def key_motion(self, key, shape, rightlimit, leftlimit=0):
@@ -124,6 +135,11 @@ class Tetris:
             shape.move_right(rightlimit, self.window)
         elif key in [curses.KEY_DOWN, ord('j')]:
             shape.move_down(self.window)
+
+    def update_info(self):
+        message = 'Score: {}'.format(self.screen_blocks.score)
+        self.info_window.addstr(10, 2, message)
+        self.info_window.refresh()
 
 
 def should_move(prevtime, downwards_speed=Tetris.DOWNWARDS_SPEED):
