@@ -62,10 +62,10 @@ class ScreenBlocks:
 
 class Tetris:
     SCREEN_WIDTH = 15
-    DOWNWARDS_SPEED = 0.01  # number of characters to move down per second
+    DOWNWARDS_SPEED = 0.0075# 0.01  # number of characters to move down per second
     PADDING = 1
     INFO_WIDTH = 20
-    MIN_HEIGHT = 30
+    MIN_HEIGHT = 20
     pause = False
 
     def __init__(self, stdscreen):
