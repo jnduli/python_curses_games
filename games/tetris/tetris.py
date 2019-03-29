@@ -64,6 +64,7 @@ class Tetris:
     PADDING = 1
     INFO_WIDTH = 20
     MIN_HEIGHT = 30
+    pause = False
 
     def __init__(self, stdscreen):
         curses.curs_set(0)
@@ -90,6 +91,10 @@ class Tetris:
         key = 0
         shape = None
         while key is not ord('q'):
+            if (self.pause):
+                pkey = self.window.getch()
+                self.key_motion(pkey, shape, self.screen_blocks.rightlimit, self.screen_blocks.leftlimit)
+                continue
             if (shape is None):
                 shape = get_random_shape(y=0, x=width//3 + 1)
             self.key_motion(key, shape, self.screen_blocks.rightlimit, self.screen_blocks.leftlimit)
@@ -107,7 +112,9 @@ class Tetris:
             key = self.window.getch()
 
     def key_motion(self, key, shape, rightlimit, leftlimit=0):
-        if key is ord('r'):
+        if key is ord('p'):
+            self.pause = not self.pause
+        elif key is ord('r'):
             shape.rotate_clockwise(self.window, rightlimit, leftlimit)
         elif key in [curses.KEY_LEFT, ord('h')]:
             shape.move_left(leftlimit, self.window)
