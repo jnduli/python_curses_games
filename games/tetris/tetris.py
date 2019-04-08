@@ -76,6 +76,8 @@ class Tetris:
             raise TerminalTooSmallError("The terminal height is too small")
         if width < self.SCREEN_WIDTH + self.INFO_WIDTH:
             raise TerminalTooSmallError("The terminal widht is too small")
+        if time.get_clock_info('time').resolution > 1e-03:
+            raise Exception('Clock too slow for use')
 
         self.create_game_board(height, width)
         self.create_info_board()
@@ -97,7 +99,7 @@ class Tetris:
         self.info_window.border(0, 0, 0, 0, 0, 0, 0, 0)
 
     def loop(self):
-        prev_time = time.time_ns()
+        prev_time = time_ms()
 
         height, width = self.window.getmaxyx()
         key = 0
@@ -112,7 +114,7 @@ class Tetris:
             self.key_motion(key, shape, self.screen_blocks.rightlimit, self.screen_blocks.leftlimit)
             if (should_move(prev_time)):
                 shape.move_down(self.window)
-                prev_time = time.time_ns()
+                prev_time = time_ms() 
 
             if self.screen_blocks.check_shape_touched_floor(shape.shape):
                 self.screen_blocks.occupy(shape.shape)
@@ -143,7 +145,11 @@ class Tetris:
 
 
 def should_move(prevtime, downwards_speed=Tetris.DOWNWARDS_SPEED):
-    nanos = 1000000 / downwards_speed
-    if (time.time_ns() - prevtime) >= nanos:
+    millis = 1 / downwards_speed
+    if (time_ms() - prevtime) >= millis:
         return True
     return False
+
+
+def time_ms():
+    return time.time() * 1000
