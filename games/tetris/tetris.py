@@ -52,7 +52,7 @@ class ActiveGameArea:
 class Tetris:
     SCREEN_WIDTH = 15
     MIN_HEIGHT = 20
-    INFO_WIDTH = 10
+    INFO_WIDTH = 15
     PADDING = 2
 
     def __init__(self, stdscreen):
@@ -89,6 +89,9 @@ class Tetris:
         self.info_window = curses.newwin(
                 height, self.INFO_WIDTH, 0, game_right_x + self.PADDING * 2)
         self.info_window.border(0, 0, 0, 0, 0, 0, 0, 0)
+        self.info_window.addstr(1, 2, 'r-rotate')
+        self.info_window.addstr(2, 2, 'h/left-left')
+        self.info_window.addstr(3, 2, 'l/right-right')
         self.info_window.refresh()
 
     def render(self, matrix):
@@ -109,7 +112,6 @@ class Tetris:
                 score = self.active_board.clear()
                 if score > 0:
                     self.score += score
-                    self.update_info()
                 shape = None
             else:
                 self.key_motion(key, shape, self.rightlimit)
@@ -120,7 +122,7 @@ class Tetris:
     def key_motion(self, key, shape, rightlimit, leftlimit=0):
         #  if key is ord('p'):
         #  self.pause = not self.pause
-        if key is ord('r'):
+        if key in [curses.KEY_UP, ord('r')]:
             shape.rotate_clockwise(rightlimit, leftlimit)
         elif key in [curses.KEY_LEFT, ord('h')]:
             shape.move_left(leftlimit)
@@ -128,9 +130,3 @@ class Tetris:
             shape.move_right(rightlimit)
         #  elif key in [curses.KEY_DOWN, ord('j')]:
             #  shape.move_down()
-
-    def update_info(self):
-        message = 'Score:'
-        self.info_window.addstr(10, 2, message)
-        self.info_window.addstr(11, 2, str(self.score))
-        self.info_window.refresh()
