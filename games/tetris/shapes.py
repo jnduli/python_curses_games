@@ -21,38 +21,26 @@ class Shape:
     def __getitem__(self, index):
         return self.shape[index]
 
-    def draw(self, window):
-        for point in self.shape:
-            window.addch(int(point.y), int(point.x), curses.ACS_CKBOARD)
-
-    def clear(self, window):
-        for point in self.shape:
-            window.addch(int(point.y), int(point.x), ' ')
-
-    def move_down(self, window):
-        self.clear(window)
+    def move_down(self):
         self.shape = [Point(y=coord.y+1, x=coord.x) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y+1, x=coord.x)
                             for coord in self.boundingbox]
 
-    def move_left(self, leftlimit, window):
-        self.clear(window)
+    def move_left(self, leftlimit):
         if int(self.boundingbox[0].x) <= leftlimit:
             return
         self.shape = [Point(y=coord.y, x=coord.x-1) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y, x=coord.x-1)
                             for coord in self.boundingbox]
 
-    def move_right(self, rightlimit, window):
-        self.clear(window)
+    def move_right(self, rightlimit):
         if int(self.boundingbox[1].x) >= rightlimit:
             return
         self.shape = [Point(y=coord.y, x=coord.x+1) for coord in self.shape]
         self.boundingbox = [Point(y=coord.y, x=coord.x+1)
                             for coord in self.boundingbox]
 
-    def rotate_clockwise(self, window, rightlimit, leftlimit):
-        self.clear(window)
+    def rotate_clockwise(self, rightlimit, leftlimit):
         [bb_y, bb_x] = self.get_shape_center()
         origin = Point(y=bb_y, x=bb_x)
         shape_relative = [Point(y=coord.y-bb_y, x=coord.x-bb_x)
