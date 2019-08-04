@@ -1,5 +1,4 @@
 from collections import namedtuple
-import curses
 
 Point = namedtuple('Point', ['y', 'x'])
 
