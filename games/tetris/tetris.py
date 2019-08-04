@@ -3,75 +3,61 @@ import random
 import time
 from .shapes import shapes
 from games.errors import TerminalTooSmallError
-import logging
+import copy
 
 
 def get_random_shape(y, x):
     return shapes[random.randint(0, len(shapes)-1)](y=y, x=x)
 
 
-class ScreenBlocks:
+class ActiveGameArea:
 
-    def __init__(self, width, height, padding):
-        self.shape = [[0 for i in range(0, width+1)] for i in range(0, height)]
-        self.padding = padding
-        self.leftlimit = padding
-        self.rightlimit = width - padding
-        self.score = 0
+    def __init__(self, height, width):
+        self.board = [[' ' for i in range(width+1)] for j in range(height+1)]
+        self.width = width
+        self.height = height
 
-    def is_occupied(self, y, x):
-        return self.shape[y][x] == 1
+    def matrix(self, shape=None):
+        if shape is None:
+            return self.board
+        temp_board = copy.deepcopy(self.board)
+        if shape is not None:
+            for point in shape.shape:
+                temp_board[int(point.y)][int(point.x)] = curses.ACS_CKBOARD
+        return temp_board
 
     def check_shape_touched_floor(self, shape):
-        for coord in shape:
-            if (int(coord.y) == len(self.shape)-1):
-                return True
-            if self.is_occupied(int(coord.y)+1, int(coord.x)):
-                return True
+        try:
+            for coord in shape.shape:
+                if self.board[int(coord.y)+1][int(coord.x)] != ' ':
+                    return True
+        except IndexError:
+            return True
         return False
 
     def occupy(self, shape):
         for coord in shape:
-            self.shape[int(coord.y)][int(coord.x)] = 1
+            self.board[int(coord.y)][int(coord.x)] = curses.ACS_CKBOARD
 
-    def draw(self, window):
-        for y, row in enumerate(self.shape):
-            for x, point in enumerate(row):
-                if point == 1:
-                    window.addch(y, x, curses.ACS_CKBOARD)
-                elif x > self.padding and x < len(self.shape[0])-self.padding-2:
-                    window.addch(y, x, ' ')
-
-    def clear_and_score(self, window):
-        # window is added as a parameter because for some reason there is
-        # persistence of some blocks after it is removed, so after clear the
-        # whole bottom row is replaced with ' '
-        for row in self.shape:
-            if 0 not in row[self.padding:-self.padding]:
-                logging.info('Removing row')
-                logging.info(self.shape)
-                # Remove the whole row
-                self.shape.remove(row)
-                # Append black row to top
-                self.shape.insert(0, [0 for i in range(0, len(row))])
-                self.score = self.score + 1
-                [window.addch(len(self.shape)-1, x, ' ')
-                    for x in range(1, len(row)-1)]
-        return self.score
+    def clear(self):
+        score = 0
+        for row in self.board:
+            if ' ' not in row:
+                self.board.insert(0, [' ' for i in range(len(row))])
+                self.board.remove(row)
+                score = score + 1
+        return score
 
 
 class Tetris:
     SCREEN_WIDTH = 15
-    DOWNWARDS_SPEED = 0.0075# 0.01  # number of characters to move down per second
-    PADDING = 1
-    INFO_WIDTH = 20
     MIN_HEIGHT = 20
-    pause = False
+    INFO_WIDTH = 10
+    PADDING = 2
 
     def __init__(self, stdscreen):
         curses.curs_set(0)
         height, width = stdscreen.getmaxyx()
-
         if height < self.MIN_HEIGHT:
             raise TerminalTooSmallError("The terminal height is too small")
         if width < self.SCREEN_WIDTH + self.INFO_WIDTH:
@@ -80,13 +66,19 @@ class Tetris:
             raise Exception('Clock too slow for use')
 
         self.create_game_board(height, width)
+        self.create_game_board(height, width)
+        active_h, active_w = self.window.getmaxyx()
+        self.active_board = ActiveGameArea(
+                active_h-(self.PADDING*2),
+                active_w-(self.PADDING*2))
+        self.rightlimit = active_w - (self.PADDING*2)
         self.create_info_board()
-        self.screen_blocks = ScreenBlocks(self.SCREEN_WIDTH-self.PADDING, height-self.PADDING, self.PADDING)
 
     def create_game_board(self, height, width):
+        self.score = 0
         self.window = curses.newwin(height, self.SCREEN_WIDTH, 0, width//2)
         self.window.keypad(1)
-        self.window.timeout(41)  # This is set to throttle cpu usage
+        self.window.timeout(141)  # This is set to throttle cpu usage
         self.window.border(0, 0, 0, 0, 0, 0, 0, 0)
 
     def create_info_board(self):
@@ -95,61 +87,50 @@ class Tetris:
         (height, win_width) = self.window.getmaxyx()
         game_right_x = x + win_width
         self.info_window = curses.newwin(
-                height, self.INFO_WIDTH, 0, game_right_x + self.PADDING)
+                height, self.INFO_WIDTH, 0, game_right_x + self.PADDING * 2)
         self.info_window.border(0, 0, 0, 0, 0, 0, 0, 0)
+        self.info_window.refresh()
+
+    def render(self, matrix):
+        for y, row in enumerate(matrix):
+            for x, char in enumerate(row):
+                self.window.addch(y+self.PADDING, x+self.PADDING, matrix[y][x])
 
     def loop(self):
-        prev_time = time_ms()
-
-        height, width = self.window.getmaxyx()
         key = 0
         shape = None
         while key is not ord('q'):
-            if (self.pause):
-                pkey = self.window.getch()
-                self.key_motion(pkey, shape, self.screen_blocks.rightlimit, self.screen_blocks.leftlimit)
-                continue
-            if (shape is None):
-                shape = get_random_shape(y=0, x=width//3 + 1)
-            self.key_motion(key, shape, self.screen_blocks.rightlimit, self.screen_blocks.leftlimit)
-            if (should_move(prev_time)):
-                shape.move_down(self.window)
-                prev_time = time_ms() 
-
-            if self.screen_blocks.check_shape_touched_floor(shape.shape):
-                self.screen_blocks.occupy(shape.shape)
-                shape = None
-            self.screen_blocks.clear_and_score(self.window)
-            self.screen_blocks.draw(self.window)
-            if shape:
-                shape.draw(self.window)
-            self.update_info()
             key = self.window.getch()
+            if shape is None:
+                active_h, active_w = self.window.getmaxyx()
+                shape = get_random_shape(y=self.PADDING, x=(active_w-1)//3)
+            if self.active_board.check_shape_touched_floor(shape):
+                self.active_board.occupy(shape)
+                score = self.active_board.clear()
+                if score > 0:
+                    self.score += score
+                    self.update_info()
+                shape = None
+            else:
+                self.key_motion(key, shape, self.rightlimit)
+                shape.move_down()
+            matrix = self.active_board.matrix(shape)
+            self.render(matrix)
 
     def key_motion(self, key, shape, rightlimit, leftlimit=0):
-        if key is ord('p'):
-            self.pause = not self.pause
-        elif key is ord('r'):
-            shape.rotate_clockwise(self.window, rightlimit, leftlimit)
+        #  if key is ord('p'):
+        #  self.pause = not self.pause
+        if key is ord('r'):
+            shape.rotate_clockwise(rightlimit, leftlimit)
         elif key in [curses.KEY_LEFT, ord('h')]:
-            shape.move_left(leftlimit, self.window)
+            shape.move_left(leftlimit)
         elif key in [curses.KEY_RIGHT, ord('l')]:
-            shape.move_right(rightlimit, self.window)
-        elif key in [curses.KEY_DOWN, ord('j')]:
-            shape.move_down(self.window)
+            shape.move_right(rightlimit)
+        #  elif key in [curses.KEY_DOWN, ord('j')]:
+            #  shape.move_down()
 
     def update_info(self):
-        message = 'Score: {}'.format(self.screen_blocks.score)
+        message = 'Score:'
         self.info_window.addstr(10, 2, message)
+        self.info_window.addstr(11, 2, str(self.score))
         self.info_window.refresh()
-
-
-def should_move(prevtime, downwards_speed=Tetris.DOWNWARDS_SPEED):
-    millis = 1 / downwards_speed
-    if (time_ms() - prevtime) >= millis:
-        return True
-    return False
-
-
-def time_ms():
-    return time.time() * 1000
