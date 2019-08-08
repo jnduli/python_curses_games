@@ -18,6 +18,8 @@ def initial_food(width, height):
 
 class Snake:
     SCOREHEIGHT = 4
+    MOTIONKEYS = (curses.KEY_DOWN, curses.KEY_UP, curses.KEY_LEFT,
+                  curses.KEY_RIGHT, ord('j'), ord('k'), ord('h'), ord('l'))
 
     def __init__(self, stdscreen):
         curses.curs_set(0)
@@ -52,13 +54,13 @@ class Snake:
 
     def move_snake(self, key):
         new_head = [self.snake[0][0], self.snake[0][1]]
-        if key == curses.KEY_DOWN:
+        if key in [curses.KEY_DOWN, ord('j')]:
             new_head[0] += 1
-        if key == curses.KEY_UP:
+        if key in [curses.KEY_UP, ord('k')]:
             new_head[0] -= 1
-        if key == curses.KEY_LEFT:
+        if key in [curses.KEY_LEFT, ord('h')]:
             new_head[1] -= 1
-        if key == curses.KEY_RIGHT:
+        if key in [curses.KEY_RIGHT, ord('l')]:
             new_head[1] += 1
         self.snake.insert(0, new_head)
 
@@ -83,7 +85,11 @@ class Snake:
         score = 0
         while True:
             next_key = self.game_window.getch()
-            key = key if next_key == -1 else next_key
+            # Quitting the game
+            if next_key == ord('q'):
+                break
+            if next_key in self.MOTIONKEYS:
+                key = next_key
 
             if self.snake_beyond_boundaries_or_hit_itself():
                 return
@@ -91,16 +97,19 @@ class Snake:
             if self.eat_food():
                 score = score + 1
                 self.update_score(score)
-                self.game_window.addch(self.food[0], self.food[1], curses.ACS_PI)
+                self.game_window.addch(self.food[0],
+                                       self.food[1], curses.ACS_PI)
             else:
                 tail = self.snake.pop()
                 self.game_window.addch(tail[0], tail[1], ' ')
-            self.game_window.addch(self.snake[0][0], self.snake[0][1], curses.ACS_CKBOARD)
+            self.game_window.addch(self.snake[0][0],
+                                   self.snake[0][1], curses.ACS_CKBOARD)
 
 
 def snake_game(stdscreen):
     snake = Snake(stdscreen)
     snake.loop()
+
 
 if __name__ == '__main__':
     curses.wrapper(snake_game)
