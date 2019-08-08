@@ -41,12 +41,18 @@ class Race(Collision):
     def game_width(self):
         return self.x_positions[-1] + Car.CAR_WIDTH + self.PADDING
 
+    def pause(self):
+        while self.game_window.getch() != ord('p'):
+            continue
+
     def loop(self):
         key = 0
         score = 0
         level = 0
         while key is not ord('q'):
             key = self.game_window.getch()
+            if key == ord('p'):
+                self.pause()
             if (self.check_for_collisions(self.hero, self.villains)):
                 return
             self.villains.random_add(self.hero, difficulty=level)

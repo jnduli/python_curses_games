@@ -79,6 +79,10 @@ class Snake:
             return True
         return False
 
+    def pause(self):
+        while self.game_window.getch() != ord('p'):
+            continue
+
     def loop(self):
         # Initial direction of snake
         key = curses.KEY_RIGHT
@@ -88,6 +92,9 @@ class Snake:
             # Quitting the game
             if next_key == ord('q'):
                 break
+            if next_key == ord('p'):
+                self.pause()
+
             if next_key in self.MOTIONKEYS:
                 key = next_key
 

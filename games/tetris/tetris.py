@@ -104,6 +104,9 @@ class Tetris:
         shape = None
         while key is not ord('q'):
             key = self.window.getch()
+            if key == ord('p'):
+                self.pause()
+
             if shape is None:
                 active_h, active_w = self.window.getmaxyx()
                 shape = get_random_shape(y=self.PADDING, x=(active_w-1)//3)
@@ -118,6 +121,10 @@ class Tetris:
                 shape.move_down()
             matrix = self.active_board.matrix(shape)
             self.render(matrix)
+
+    def pause(self):
+        while self.window.getch() != ord('p'):
+            continue
 
     def key_motion(self, key, shape, rightlimit, leftlimit=0):
         #  if key is ord('p'):
