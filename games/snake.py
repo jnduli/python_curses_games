@@ -6,17 +6,17 @@ def initial_snake(width, height):
     snake_x = width // 4
     snake_y = height // 2
     return [
-            [snake_y, snake_x],
-            [snake_y, snake_x-1],
-            [snake_y, snake_x-2]
-            ]
+        [snake_y, snake_x],
+        [snake_y, snake_x-1],
+        [snake_y, snake_x-2]
+    ]
 
 
 def initial_food(width, height):
     return [height//2, width//2]
 
 
-class Snake:
+class Snake(object):
     SCOREHEIGHT = 4
     MOTIONKEYS = (curses.KEY_DOWN, curses.KEY_UP, curses.KEY_LEFT,
                   curses.KEY_RIGHT, ord('j'), ord('k'), ord('h'), ord('l'))
@@ -37,14 +37,14 @@ class Snake:
 
     def create_game_window(self):
         self.game_window = curses.newwin(
-                self.height-self.SCOREHEIGHT, self.width, self.SCOREHEIGHT, 0)
+            self.height-self.SCOREHEIGHT, self.width, self.SCOREHEIGHT, 0)
         self.game_window.keypad(1)
         self.game_window.timeout(100)
 
     def update_score(self, score):
-        scoreMessage = 'Score: {}'.format(score)
+        score_message = 'Score: {}'.format(score)
         height, width = self.score_window.getmaxyx()
-        self.score_window.addstr(height//2, width//2, scoreMessage)
+        self.score_window.addstr(height//2, width//2, score_message)
         self.score_window.refresh()
 
     def snake_beyond_boundaries_or_hit_itself(self):
@@ -62,7 +62,7 @@ class Snake:
             new_head[1] -= 1
         if key in [curses.KEY_RIGHT, ord('l')]:
             new_head[1] += 1
-        self.snake.insert(0, new_head)
+            self.snake.insert(0, new_head)
 
     def new_food(self):
         while True:
@@ -109,8 +109,8 @@ class Snake:
             else:
                 tail = self.snake.pop()
                 self.game_window.addch(tail[0], tail[1], ' ')
-            self.game_window.addch(self.snake[0][0],
-                                   self.snake[0][1], curses.ACS_CKBOARD)
+                self.game_window.addch(self.snake[0][0],
+                                       self.snake[0][1], curses.ACS_CKBOARD)
 
 
 def snake_game(stdscreen):
