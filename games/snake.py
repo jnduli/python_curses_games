@@ -17,7 +17,7 @@ def initial_snake(width, height):
 
 
 def initial_food(width, height):
-    return [height // 2, width // 2]
+    return Point(x_pos=width // 2, y_pos=height // 2)
 
 
 class Snake(object):
@@ -32,7 +32,7 @@ class Snake(object):
         self.create_game_window()
         self.snake = initial_snake(self.width, self.height)
         self.food = initial_food(self.width, self.height)
-        self.game_window.addch(self.food[0], self.food[1], curses.ACS_PI)
+        self.game_window.addch(self.food.y_pos, self.food.x_pos, curses.ACS_PI)
         self.update_score(0)
 
     def create_score_window(self):
@@ -57,23 +57,22 @@ class Snake(object):
                 or self.snake[0] in self.snake[1:])
 
     def move_snake(self, key):
-        new_head = [self.snake[0].y_pos, self.snake[0].x_pos]
+        new_head = Point(x_pos=self.snake[0].x_pos, y_pos=self.snake[0].y_pos)
         if key in [curses.KEY_DOWN, ord('j')]:
-            new_head[0] += 1
+            new_head = new_head._replace(y_pos=new_head.y_pos + 1)
         if key in [curses.KEY_UP, ord('k')]:
-            new_head[0] -= 1
+            new_head = new_head._replace(y_pos=new_head.y_pos - 1)
         if key in [curses.KEY_LEFT, ord('h')]:
-            new_head[1] -= 1
+            new_head = new_head._replace(x_pos=new_head.x_pos - 1)
         if key in [curses.KEY_RIGHT, ord('l')]:
-            new_head[1] += 1
-            self.snake.insert(0, new_head)
+            new_head = new_head._replace(x_pos=new_head.x_pos + 1)
+        self.snake.insert(0, new_head)
 
     def new_food(self):
         while True:
-            new_food = [
-                random.randint(1, self.height - self.SCOREHEIGHT - 1),
-                random.randint(1, self.width - 1)
-            ]
+            new_food = Point(x_pos=random.randint(1, self.width - 1),
+                             y_pos=random.randint(
+                                 1, self.height - self.SCOREHEIGHT - 1))
             if new_food not in self.snake:
                 return new_food
 
@@ -108,11 +107,11 @@ class Snake(object):
             if self.eat_food():
                 score = score + 1
                 self.update_score(score)
-                self.game_window.addch(self.food[0], self.food[1],
+                self.game_window.addch(self.food.y_pos, self.food.x_pos,
                                        curses.ACS_PI)
             else:
                 tail = self.snake.pop()
-                self.game_window.addch(tail[0], tail[1], ' ')
+                self.game_window.addch(tail.y_pos, tail.x_pos, ' ')
                 self.game_window.addch(self.snake[0].y_pos,
                                        self.snake[0].x_pos, curses.ACS_CKBOARD)
 
