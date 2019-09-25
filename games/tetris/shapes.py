@@ -1,6 +1,4 @@
-from collections import namedtuple
-
-Point = namedtuple('Point', ['y', 'x'])
+from games.shapes import Point
 
 
 def rotate_point_clockwise(point, origin):
@@ -76,13 +74,13 @@ class Zed(Shape):
 
     def __init__(self, y=0, x=0):
         shape = [
-                Point(y, x), Point(y, x+1),
-                Point(y+1, x+1), Point(y+1, x+2)
-                ]
+            Point(y, x), Point(y, x+1),
+            Point(y+1, x+1), Point(y+1, x+2)
+        ]
         boundingbox = [
-                Point(y, x), Point(y, x+2),
-                Point(y+1, x), Point(y+1, x+2)
-                ]
+            Point(y, x), Point(y, x+2),
+            Point(y+1, x), Point(y+1, x+2)
+        ]
         super(Zed, self).__init__(shape, boundingbox)
 
 
@@ -90,14 +88,14 @@ class L(Shape):
 
     def __init__(self, y=0, x=0):
         shape = [
-                Point(y, x),
-                Point(y+1, x),
-                Point(y+2, x), Point(y+2, x+1)
-                ]
+            Point(y, x),
+            Point(y+1, x),
+            Point(y+2, x), Point(y+2, x+1)
+        ]
         boundingbox = [
-                Point(y, x), Point(y, x+1),
-                Point(y+2, x), Point(y+2, x+1)
-                ]
+            Point(y, x), Point(y, x+1),
+            Point(y+2, x), Point(y+2, x+1)
+        ]
         super(L, self).__init__(shape, boundingbox)
 
 
@@ -105,9 +103,9 @@ class Box(Shape):
 
     def __init__(self, y=0, x=0):
         shape = [
-                Point(y, x), Point(y, x+1),
-                Point(y+1, x), Point(y+1, x+1)
-                ]
+            Point(y, x), Point(y, x+1),
+            Point(y+1, x), Point(y+1, x+1)
+        ]
         super(Box, self).__init__(shape, shape)
 
 
@@ -115,14 +113,14 @@ class Tee(Shape):
 
     def __init__(self, y=0, x=0):
         shape = [
-                Point(y, x),
-                Point(y+1, x), Point(y+1, x+1),
-                Point(y+2, x)
-                ]
+            Point(y, x),
+            Point(y+1, x), Point(y+1, x+1),
+            Point(y+2, x)
+        ]
         boundingbox = [
-                Point(y, x), Point(y, x+1),
-                Point(y+2, x), Point(y+2, x+1)
-                ]
+            Point(y, x), Point(y, x+1),
+            Point(y+2, x), Point(y+2, x+1)
+        ]
         super(Tee, self).__init__(shape, boundingbox)
 
 
