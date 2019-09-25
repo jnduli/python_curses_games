@@ -109,8 +109,8 @@ class Snake:
             else:
                 tail = self.snake.pop()
                 self.game_window.addch(tail.y, tail.x, ' ')
-                self.game_window.addch(self.snake[0].y, self.snake[0].x,
-                                       curses.ACS_CKBOARD)
+            self.game_window.addch(self.snake[0].y, self.snake[0].x,
+                                   curses.ACS_CKBOARD)
 
 
 def snake_game(stdscreen):
