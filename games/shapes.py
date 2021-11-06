@@ -1,22 +1,22 @@
 from collections import namedtuple
 from dataclasses import dataclass
-from ABC import abstractmethod
+import abc
 from typing import List
 import curses
 
 Point = namedtuple('Point', ['y', 'x'])
 
 @dataclass()
-class Character:
+class Character(abc.ABC):
     y: int
     x: int
     window: curses.window
 
-    @abstractmethod()
+    @abc.abstractmethod
     def body(self) -> List[tuple[int, int]]:
         """The body of the character"""
 
-    @abstractmethod()
+    @abc.abstractmethod
     def bounding_box(self) -> List[tuple[int, int]]:
         """The box the character is in"""
 
@@ -28,6 +28,6 @@ class Character:
         for coord in self.body():
             self.window.addch(*coord, ' ')
 
-    @abstractmethod()
+    @abc.abstractmethod
     def move(self):
         """How the character moves in every tick, just update the x and y"""
